@@ -210,9 +210,25 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    let currentSection = 'grading';
+    let map;
+    let transportMarkers = [];
+    let transportData = [];
+    let transportConditionsChart;
+
+    function loadAllSections() {
+      loadGradingStandards();
+      loadQualityReports();
+      loadMeatTracking();
+      loadQualityAnalysis();
+      loadPackagingData();
+      loadTransportData();
+    }
+
     function initializeUser() {
       const username = localStorage.getItem("username") || "User";
       document.getElementById("usernameDisplay").textContent = username;
+      showSection(currentSection);
     }
     function logout() {
       localStorage.removeItem("username");
