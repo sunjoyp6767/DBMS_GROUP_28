@@ -392,6 +392,45 @@
       }
     });
   }
+
+  function editPackage(id) {
+    const row = [...document.querySelectorAll('#packagingTable tbody tr')].find(r => r.cells[0].textContent == id);
+    if (!row) return alert('Package not found.');
+  
+    document.getElementById('editPkgId').value = id;
+    document.getElementById('editPkgType').value = row.cells[3].textContent;
+    document.getElementById('editPkgWeight').value = row.cells[4].textContent;
+    document.getElementById('editPkgDate').value = row.cells[5].textContent;
+    document.getElementById('editPkgZip').value = row.cells[6].textContent;
+  
+    new bootstrap.Modal(document.getElementById('editPackageModal')).show();
+  }
+  
+  document.getElementById('editPackageForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const id = document.getElementById('editPkgId').value;
+    const data = new FormData();
+    data.append('package_id', id);
+    data.append('package_type', document.getElementById('editPkgType').value);
+    data.append('weight', document.getElementById('editPkgWeight').value);
+    data.append('date_packaged', document.getElementById('editPkgDate').value);
+    data.append('zip', document.getElementById('editPkgZip').value);
+  
+    fetch('php/update_package.php', {
+      method: 'POST',
+      body: data
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          alert('Package updated successfully');
+          loadPackagingData();
+          bootstrap.Modal.getInstance(document.getElementById('editPackageModal')).hide();
+        } else {
+          alert('Error: ' + res.message);
+        }
+      });
+  });
   </script>
 </body>
 </html>
