@@ -271,6 +271,42 @@
         updatePackagingChart(data);
       });
   }
+
+  function addPackaging() {
+    const batchId = document.getElementById('pkgBatchId').value;
+    const pkgType = document.getElementById('pkgType').value;
+    const weight = document.getElementById('pkgWeight').value;
+    const date = document.getElementById('pkgDate').value;
+    const zip = document.getElementById('pkgZip').value;
+  
+    if (!batchId || !pkgType || !weight || !date || !zip) {
+      alert('Please fill all fields');
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('batch_id', batchId);
+    formData.append('package_type', pkgType);
+    formData.append('weight', weight);
+    formData.append('date_packaged', date);
+    formData.append('zip', zip);
+  
+    fetch('php/add_package.php', {
+      method: 'POST',
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Package added successfully');
+          loadPackagingData();
+          document.getElementById('pkgWeight').value = '';
+          document.getElementById('pkgZip').value = '';
+        } else {
+          alert('Error: ' + data.message);
+        }
+      });
+  }
   </script>
 </body>
 </html>
