@@ -445,6 +445,16 @@
         });
     }
   }
+
+  document.getElementById('packagingSearch').addEventListener('input', function () {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#packagingTable tbody tr');
+
+    rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(searchValue) ? '' : 'none';
+  });
+});
   </script>
 </body>
 </html>
