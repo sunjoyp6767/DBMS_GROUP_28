@@ -307,6 +307,27 @@
         }
       });
   }
+
+  function filterPackagingTable() {
+    const search = document.getElementById('packagingSearch').value.toLowerCase();
+    const type = document.getElementById('packagingTypeFilter').value;
+    const minWeight = parseFloat(document.getElementById('packagingWeightFrom').value) || 0;
+    const maxWeight = parseFloat(document.getElementById('packagingWeightTo').value) || Infinity;
+  
+    const rows = document.querySelectorAll('#packagingTable tbody tr');
+  
+    rows.forEach(row => {
+      const rowText = row.textContent.toLowerCase();
+      const rowType = row.cells[3].textContent;
+      const weight = parseFloat(row.cells[4].textContent) || 0;
+  
+      const matchText = !search || rowText.includes(search);
+      const matchType = !type || rowType === type;
+      const matchWeight = weight >= minWeight && weight <= maxWeight;
+  
+      row.style.display = (matchText && matchType && matchWeight) ? '' : 'none';
+    });
+  }
   </script>
 </body>
 </html>
