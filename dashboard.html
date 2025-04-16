@@ -328,6 +328,70 @@
       row.style.display = (matchText && matchType && matchWeight) ? '' : 'none';
     });
   }
+
+  function updatePackagingChart(data) {
+    const typeCounts = { 'Vacuum Sealed': 0, 'Frozen': 0, 'Chilled': 0 };
+  
+    data.forEach(item => {
+      const type = item.package_type;
+      if (typeCounts[type] !== undefined) {
+        typeCounts[type]++;
+      }
+    });
+  
+    const typeCtx = document.getElementById('packagingTypeChart').getContext('2d');
+    new Chart(typeCtx, {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(typeCounts),
+        datasets: [{
+          data: Object.values(typeCounts),
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  
+    const monthCounts = {
+      Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0,
+      Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0
+    };
+  
+    data.forEach(item => {
+      if (item.date_packaged) {
+        const date = new Date(item.date_packaged);
+        const month = date.toLocaleString('default', { month: 'short' });
+        if (monthCounts[month] !== undefined) {
+          monthCounts[month]++;
+        }
+      }
+    });
+  
+    const volumeCtx = document.getElementById('packagingVolumeChart').getContext('2d');
+    new Chart(volumeCtx, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(monthCounts),
+        datasets: [{
+          label: 'Packages',
+          data: Object.values(monthCounts),
+          backgroundColor: '#4CAF50'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
   </script>
 </body>
 </html>
