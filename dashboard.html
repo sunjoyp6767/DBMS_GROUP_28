@@ -230,6 +230,47 @@
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
     }
+
+    function loadPackagingData() {
+    fetch('php/get_packaging_data.php')
+      .then(response => response.json())
+      .then(data => {
+        const tableBody = document.querySelector('#packagingTable tbody');
+        tableBody.innerHTML = '';
+  
+        data.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.package_id}</td>
+            <td>${item.batch_id || 'N/A'}</td>
+            <td>${item.product_name || 'N/A'}</td>
+            <td>${item.package_type}</td>
+            <td>${item.weight}</td>
+            <td>${item.date_packaged}</td>
+            <td>${item.zip}</td>
+            <td>${item.quality || 'N/A'}</td>
+            <td>
+              <button class="btn btn-sm btn-warning" onclick="editPackage(${item.package_id})">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deletePackage(${item.package_id})">Delete</button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+  
+        // Populate batch dropdown
+        const batchSelect = document.getElementById('pkgBatchId');
+        batchSelect.innerHTML = '<option value="">Select Batch</option>';
+        const uniqueBatches = [...new Set(data.map(item => item.batch_id))].filter(id => id);
+        uniqueBatches.forEach(id => {
+          const option = document.createElement('option');
+          option.value = id;
+          option.textContent = `Batch ${id}`;
+          batchSelect.appendChild(option);
+        });
+  
+        updatePackagingChart(data);
+      });
+  }
   </script>
 </body>
 </html>
