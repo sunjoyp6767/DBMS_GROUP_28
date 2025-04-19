@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transport Monitoring Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
+  <style>
+    body { background-color: #f8f9fa; padding: 20px; }
+    #map { height: 300px; width: 100%; }
+    .chart-container { height: 300px; }
+
+    .leaflet-routing-container {
+    display: none !important;
+  }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container-fluid d-flex justify-content-between">
+      <span class="navbar-brand mb-0 h1">Transport Monitoring</span>
+      <button class="btn btn-outline-light" onclick="window.location.href='index.html'">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container">
+  <!-- Filter/Search -->
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <input type="text" class="form-control" id="transportSearch" placeholder="Search License Plate...">
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" id="transportVehicleFilter">
+          <option value="">All Vehicles</option>
+          <option value="Truck">Truck</option>
+          <option value="Van">Van</option>
+          <option value="Refrigerated Truck">Refrigerated Truck</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <input type="date" class="form-control" id="transportDateFilter">
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary w-100" onclick="updateTransportUI()">Filter</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive mb-4">
+      <table class="table table-bordered" id="transportTable">
+        <thead>
+          <tr>
+            <th>Transport ID</th>
+            <th>Vehicle Type</th>
+            <th>License Plate</th>
+            <th>Transport Date</th>
+            <th>Duration</th>
+            <th>Temperature</th>
+            <th>Humidity</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Add Transport -->
+    <div class="card mb-4">
+      <div class="card-header">Add New Transport</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <select class="form-select" id="newVehicleType">
+              <option value="">Vehicle Type</option>
+              <option value="Truck">Truck</option>
+              <option value="Van">Van</option>
+              <option value="Refrigerated Truck">Refrigerated Truck</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <input type="text" class="form-control" id="newLicensePlate" placeholder="License Plate">
+          </div>
+          <div class="col-md-3">
+            <input type="date" class="form-control" id="newTransportDate">
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="newDuration" placeholder="HH:MM:SS">
+          </div>
+          <div class="col-md-1">
+            <button class="btn btn-success w-100" onclick="addTransport()">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts + Map -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">Transport Conditions</div>
+          <div class="card-body">
+            <canvas id="transportConditionsChart" class="chart-container"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">Transport Route Map</div>
+          <div class="card-body"><div id="map"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal fade" id="editTransportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editTransportForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Transport</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editTransportId">
+            <div class="mb-3">
+              <label>Vehicle Type</label>
+              <select class="form-select" id="editVehicleType">
+                <option value="Truck">Truck</option>
+                <option value="Van">Van</option>
+                <option value="Refrigerated Truck">Refrigerated Truck</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label>License Plate</label>
+              <input type="text" class="form-control" id="editLicensePlate">
+            </div>
+            <div class="mb-3">
+              <label>Transport Date</label>
+              <input type="date" class="form-control" id="editTransportDate">
+            </div>
+            <div class="mb-3">
+              <label>Duration</label>
+              <input type="text" class="form-control" id="editDuration">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-success" type="submit">Save</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  let map, transportMarkers = [], transportData = [], transportChart;
+
+  function initMap() {
+    map = L.map('map').setView([23.8103, 90.4125], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    updateTransportMap();
+  }
+
+  function loadTransportData() {
+    fetch('php/get_transport_data.php')
+      .then(res => res.json())
+      .then(data => {
+        transportData = data;
+        updateTransportUI();
+      });
+  }
+
+  function updateTransportUI() {
+    const search = document.getElementById('transportSearch').value.toLowerCase();
+    const vehicle = document.getElementById('transportVehicleFilter').value;
+    const date = document.getElementById('transportDateFilter').value;
+    const filtered = transportData.filter(item =>
+      (!search || item.license_plate.toLowerCase().includes(search)) &&
+      (!vehicle || item.vehicle_type === vehicle) &&
+      (!date || item.transport_date === date)
+    );
+    renderTransportTable(filtered);
+    renderChart(filtered);
+  }
+
+  function renderTransportTable(data) {
+    const tbody = document.querySelector('#transportTable tbody');
+    tbody.innerHTML = '';
+    data.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item.transport_id}</td>
+        <td>${item.vehicle_type}</td>
+        <td>${item.license_plate}</td>
+        <td>${item.transport_date}</td>
+        <td>${item.transportation_duration}</td>
+        <td>${item.temperature ?? 'N/A'}</td>
+        <td>${item.humidity ?? 'N/A'}</td>
+        <td>
+          <button class="btn btn-sm btn-warning" onclick="editTransport(${item.transport_id})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteTransport(${item.transport_id})">Delete</button>
+        </td>`;
+      tbody.appendChild(row);
+    });
+  }
+
+  function addTransport() {
+    const formData = new FormData();
+    formData.append('vehicle_type', document.getElementById('newVehicleType').value);
+    formData.append('license_plate', document.getElementById('newLicensePlate').value);
+    formData.append('transport_date', document.getElementById('newTransportDate').value);
+    formData.append('transportation_duration', document.getElementById('newDuration').value);
+
+    fetch('php/add_transport.php', {
+      method: 'POST',
+      body: formData
+    }).then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          loadTransportData();
+        } else {
+          alert('Error: ' + res.message);
+        }
+      });
+  }
+
+  function editTransport(id) {
+    const row = [...document.querySelectorAll('#transportTable tbody tr')].find(r => r.cells[0].textContent == id);
+    if (!row) return alert('Transport not found.');
+    document.getElementById('editTransportId').value = id;
+    document.getElementById('editVehicleType').value = row.cells[1].textContent;
+    document.getElementById('editLicensePlate').value = row.cells[2].textContent;
+    document.getElementById('editTransportDate').value = row.cells[3].textContent;
+    document.getElementById('editDuration').value = row.cells[4].textContent;
+    new bootstrap.Modal(document.getElementById('editTransportModal')).show();
+  }
+
+  document.getElementById('editTransportForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const id = document.getElementById('editTransportId').value;
+    const formData = new FormData();
+    formData.append('transport_id', id);
+    formData.append('vehicle_type', document.getElementById('editVehicleType').value);
+    formData.append('license_plate', document.getElementById('editLicensePlate').value);
+    formData.append('transport_date', document.getElementById('editTransportDate').value);
+    formData.append('transportation_duration', document.getElementById('editDuration').value);
+
+    fetch('php/update_transport.php', {
+      method: 'POST',
+      body: formData
+    }).then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          bootstrap.Modal.getInstance(document.getElementById('editTransportModal')).hide();
+          loadTransportData();
+        } else {
+          alert('Error: ' + res.message);
+        }
+      });
+  });
+
+  function deleteTransport(id) {
+    if (!confirm("Are you sure you want to delete this transport record?")) return;
+    fetch('php/delete_transport.php?id=' + id)
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) loadTransportData();
+        else alert('Error: ' + res.message);
+      });
+  }
+
+  function renderChart(data) {
+    const ctx = document.getElementById('transportConditionsChart').getContext('2d');
+    if (transportChart) transportChart.destroy();
+    const temps = data.map(d => parseFloat(d.temperature)).filter(n => !isNaN(n));
+    const hums = data.map(d => parseFloat(d.humidity)).filter(n => !isNaN(n));
+    const avgT = temps.length ? temps.reduce((a, b) => a + b) / temps.length : 0;
+    const avgH = hums.length ? hums.reduce((a, b) => a + b) / hums.length : 0;
+
+    transportChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Temperature (°C)', 'Humidity (%)'],
+        datasets: [{
+          label: 'Average Conditions',
+          data: [avgT, avgH],
+          backgroundColor: ['#FF6384', '#36A2EB']
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  function updateTransportMap() {
+  fetch('php/get_sensor_data.php')
+    .then(response => response.json())
+    .then(data => {
+      transportMarkers.forEach(marker => map.removeLayer(marker));
+      transportMarkers = [];
+      if (map._routingControl) {
+        map.removeControl(map._routingControl);
+        map._routingControl = null;
+      }
+
+      data.forEach(item => {
+        const liveLat = parseFloat(item.latitude);
+        const liveLng = parseFloat(item.longitude);
+        const destLat = parseFloat(item.dest_lat);
+        const destLng = parseFloat(item.dest_lng);
+
+        if (isNaN(liveLat) || isNaN(liveLng) || isNaN(destLat) || isNaN(destLng)) return;
+
+        const liveCoords = [liveLat, liveLng];
+        const destCoords = [destLat, destLng];
+        const liveMarker = L.marker(liveCoords, {
+          icon: L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+            iconSize: [30, 45],
+            iconAnchor: [15, 45]
+          })
+        }).bindPopup(`
+          <b>${item.vehicle_type}</b><br>${item.license_plate}<br>
+          <b>Sensor</b><br>Temp: ${item.temperature} °C<br>Humidity: ${item.humidity}%
+        `);
+        liveMarker.addTo(map);
+        transportMarkers.push(liveMarker);
+
+        const destMarker = L.circleMarker(destCoords, {
+          color: 'red',
+          radius: 6
+        }).bindPopup(`<b>Destination:</b> ${item.destination}`);
+        destMarker.addTo(map);
+        transportMarkers.push(destMarker);
+        const routingControl = L.Routing.control({
+          waypoints: [L.latLng(liveCoords), L.latLng(destCoords)],
+          addWaypoints: false,
+          draggableWaypoints: false,
+          routeWhileDragging: false,
+          fitSelectedRoutes: false,
+          show: false,
+          createMarker: () => null,
+          lineOptions: {
+            styles: [{ color: '#007bff', weight: 4 }]
+          },
+          router: L.Routing.osrmv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1'
+          })
+        }).on('routesfound', function () {
+          map.fitBounds(L.latLngBounds([liveCoords, destCoords]), { padding: [30, 30] });
+        }).addTo(map);
+        map._routingControl = routingControl;
+      });
+
+      if (transportMarkers.length > 0) {
+        const bounds = L.featureGroup(transportMarkers).getBounds();
+        map.fitBounds(bounds, { padding: [30, 30] });
+      }
+    })
+    .catch(error => {
+      console.error('Error loading transport map:', error);
+    });
+}
+
+
+  document.getElementById('transportSearch').addEventListener('input', updateTransportUI);
+  document.getElementById('transportVehicleFilter').addEventListener('change', updateTransportUI);
+  document.getElementById('transportDateFilter').addEventListener('change', updateTransportUI);
+
+  window.onload = () => {
+    initMap();
+    loadTransportData();
+  };
+</script>
+</body>
+</html>
