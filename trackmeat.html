@@ -13,15 +13,18 @@
       font-family: Arial, sans-serif;
     }
 
+
     body, html {
       height: 100%;
       background: #f9f9f9;
     }
 
+
     .container {
       display: flex;
       height: 100vh;
     }
+
 
     .sidebar {
       width: 150px;
@@ -30,26 +33,31 @@
       padding: 10px;
     }
 
+
     .logo {
       font-weight: bold;
       margin-bottom: 20px;
     }
+
 
     .sidebar ul {
       list-style: none;
       padding: 0;
     }
 
+
     .sidebar li {
       margin: 15px 0;
       cursor: pointer;
     }
+
 
     .main {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
+
 
     .top-bar {
       background: #1f2329;
@@ -60,6 +68,7 @@
       padding: 0 10px;
     }
 
+
     .user-btn {
       background: #6c757d;
       color: white;
@@ -69,6 +78,7 @@
       cursor: pointer;
     }
 
+
     .content {
       padding: 20px;
       background: white;
@@ -76,10 +86,12 @@
       overflow: auto;
     }
 
+
     h1 {
       margin-bottom: 10px;
       font-size: 20px;
     }
+
 
     .search-bar {
       width: 100%;
@@ -89,6 +101,7 @@
       border-radius: 4px;
     }
 
+
     .table-header, .table-row {
       display: grid;
       grid-template-columns: repeat(12, minmax(80px, 1fr));
@@ -96,10 +109,12 @@
       border-bottom: 1px solid #ddd;
     }
 
+
     .table-header {
       background: #f0f0f0;
       font-weight: bold;
     }
+
 
     .timeline {
       border: 1px solid #ccc;
@@ -108,6 +123,7 @@
       font-weight: bold;
       margin-top: 20px;
     }
+
 
     .chart-container {
       margin-top: 30px;
@@ -139,6 +155,7 @@
       <section class="content">
         <h1>Meat Tracking Through Supply Chain</h1>
         <input type="text" placeholder="Search by Batch ID..." class="search-bar" id="searchInput" />
+        
         <div class="table-header">
           <span>Batch ID</span>
           <span>Process Date</span>
@@ -155,9 +172,11 @@
         </div>
         <div id="dataRows"></div>
 
+
         <div class="timeline">
           Supply Chain Timeline
         </div>
+
 
         <div class="chart-container">
           <h2>Average Quality Score by Product Type</h2>
@@ -167,26 +186,33 @@
     </main>
   </div>
 
+
   <script>
     const searchInput = document.getElementById('searchInput');
     const dataRows = document.getElementById('dataRows');
     let allData = [];
 
-    // Load data from PHP
+
+    // Fetch and load data
     fetch('php/trackmeat.php')
       .then(res => res.json())
       .then(data => {
+        console.log("Fetched Data:", data); // Debug
         allData = data;
         displayData(allData);
         renderChart(allData);
+      })
+      .catch(err => {
+        console.error("Error fetching data:", err);
       });
+
 
     function displayData(data) {
       dataRows.innerHTML = '';
       data.forEach(row => {
         const div = document.createElement('div');
         div.className = 'table-row';
-        div.innerHTML = 
+        div.innerHTML = `
           <span>${row.batch_id}</span>
           <span>${row.date_processed}</span>
           <span>${row.processed_batch_id || ''}</span>
@@ -199,12 +225,13 @@
           <span>${row.vehicle_type || ''}</span>
           <span>${row.transport_date || ''}</span>
           <span><button>View</button></span>
-        ;
+        `;
         dataRows.appendChild(div);
       });
     }
 
-    // Filter ONLY by batch ID
+
+    // Search filter
     searchInput.addEventListener('input', () => {
       const search = searchInput.value.toLowerCase();
       const filtered = allData.filter(item =>
@@ -213,23 +240,34 @@
       displayData(filtered);
     });
 
+
     function renderChart(data) {
       const averages = {};
       const counts = {};
 
+
       data.forEach(item => {
-        const type = item.product_type;
+        const type = item.product_type?.trim();
         const score = parseFloat(item.quality_score);
-        if (!isNaN(score)) {
+        if (type && !isNaN(score)) {
           averages[type] = (averages[type] || 0) + score;
           counts[type] = (counts[type] || 0) + 1;
         }
       });
 
+
       const labels = Object.keys(averages);
       const avgScores = labels.map(type => (averages[type] / counts[type]).toFixed(2));
 
-      new Chart(document.getElementById('qualityChart'), {
+
+      if (labels.length === 0) {
+        console.warn("No valid product_type or quality_score found.");
+        return;
+      }
+
+
+      const ctx = document.getElementById('qualityChart').getContext('2d');
+      new Chart(ctx, {
         type: 'bar',
         data: {
           labels: labels,
@@ -255,3 +293,8 @@
   </script>
 </body>
 </html>
+
+
+
+
+
