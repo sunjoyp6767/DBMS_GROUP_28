@@ -2,6 +2,11 @@
 include "db_connect.php";
 
 
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
 $query = "SELECT
             b.Batch_ID,
             b.Date_Processed,
@@ -33,9 +38,19 @@ $query = "SELECT
           ORDER BY b.Batch_ID";
 
 
+<<<<<<< Updated upstream
 $result = $conn->query($query);
 
 
+=======
+
+
+$result = $conn->query($query);
+
+
+
+
+>>>>>>> Stashed changes
 if (!$result) {
     // Handle query error
     header('Content-Type: application/json');
@@ -44,6 +59,11 @@ if (!$result) {
 }
 
 
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
 $data = [];
 while ($row = $result->fetch_assoc()) {
     $data[] = [
@@ -70,6 +90,11 @@ while ($row = $result->fetch_assoc()) {
 }
 
 
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
 header('Content-Type: application/json');
 echo json_encode($data);
 ?>
