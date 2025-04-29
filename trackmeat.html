@@ -9,12 +9,12 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body, html {
       height: 100%;
-      background: #f0f2f5;
+      background: #f4f6f8;
     }
 
     .container {
@@ -30,17 +30,18 @@
     }
 
     .logo {
-      font-size: 1.3rem;
       font-weight: bold;
+      font-size: 20px;
       margin-bottom: 30px;
     }
 
     .sidebar ul {
       list-style: none;
+      padding: 0;
     }
 
     .sidebar li {
-      margin: 20px 0;
+      margin: 15px 0;
       cursor: pointer;
     }
 
@@ -69,73 +70,83 @@
     }
 
     .content {
-      padding: 30px;
+      padding: 20px;
       flex-grow: 1;
-      background: white;
-      overflow-y: auto;
+      overflow: auto;
+      background: #fff;
     }
 
     h1 {
-      font-size: 22px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+      font-size: 24px;
     }
 
     .search-bar {
       width: 100%;
       padding: 10px;
+      margin-bottom: 20px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      margin-bottom: 20px;
-      font-size: 16px;
     }
 
     .table-header, .table-row {
       display: grid;
-      grid-template-columns: repeat(13, minmax(100px, 1fr)) 100px;
-      padding: 12px;
-      align-items: center;
+      grid-template-columns: repeat(14, minmax(80px, 1fr));
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      font-size: 14px;
     }
 
     .table-header {
-      background: #f1f3f5;
+      background: #f0f0f0;
       font-weight: bold;
-      border-bottom: 2px solid #ddd;
-    }
-
-    .table-row {
-      background: #ffffff;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .table-row:nth-child(even) {
-      background: #f9f9f9;
     }
 
     .table-row button {
-      padding: 6px 10px;
-      background-color: #007bff;
-      color: white;
+      padding: 5px 8px;
       border: none;
+      background: #007bff;
+      color: white;
       border-radius: 4px;
       cursor: pointer;
     }
 
     .timeline {
+      border-left: 3px solid #007bff;
+      padding-left: 20px;
       margin-top: 30px;
-      font-weight: bold;
+      margin-bottom: 20px;
     }
 
-    /* Modal styling */
+    .timeline-event {
+      background: #f9f9f9;
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      position: relative;
+      border-radius: 5px;
+    }
+
+    .timeline-event::before {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #007bff;
+      left: -27px;
+      top: 15px;
+      border-radius: 50%;
+    }
+
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
-      z-index: 1000;
-      left: 0;
+      z-index: 999;
       top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.5);
+      background-color: rgba(0,0,0,0.4);
     }
 
     .modal-content {
@@ -143,49 +154,46 @@
       margin: 10% auto;
       padding: 20px;
       border-radius: 8px;
-      width: 60%;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-
-    .modal-content h2 {
-      margin-bottom: 20px;
-    }
-
-    .modal-content p {
-      margin: 8px 0;
+      width: 500px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
 
     .close {
+      color: #aaa;
       float: right;
-      font-size: 22px;
+      font-size: 24px;
+      font-weight: bold;
       cursor: pointer;
     }
 
-    .print-btn {
-      margin-top: 20px;
+    .close:hover {
+      color: black;
+    }
+
+    .modal button.print-btn {
+      margin-top: 15px;
+      padding: 8px 12px;
       background: #28a745;
       color: white;
-      padding: 8px 16px;
       border: none;
-      border-radius: 4px;
+      border-radius: 5px;
       cursor: pointer;
     }
+
   </style>
 </head>
 <body>
   <div class="container">
     <aside class="sidebar">
       <div class="logo">TrackNGrade</div>
-      <nav>
-        <ul>
-          <li>Grading Standards</li>
-          <li>Reports</li>
-          <li>Meat Tracking</li>
-          <li>Quality Analysis</li>
-          <li>Packaging Oversight</li>
-          <li>Transport Monitoring</li>
-        </ul>
-      </nav>
+      <ul>
+        <li>Grading Standards</li>
+        <li>Reports</li>
+        <li>Meat Tracking</li>
+        <li>Quality Analysis</li>
+        <li>Packaging Oversight</li>
+        <li>Transport Monitoring</li>
+      </ul>
     </aside>
     <main class="main">
       <header class="top-bar">
@@ -213,109 +221,114 @@
         </div>
         <div id="dataRows"></div>
 
-        <div class="timeline">Supply Chain Timeline</div>
+        <h2>Supply Chain Timeline</h2>
+        <div id="timeline" class="timeline"></div>
       </section>
     </main>
   </div>
 
   <!-- Modal -->
   <div id="detailModal" class="modal">
-    <div class="modal-content" id="modalContent">
+    <div class="modal-content" id="printArea">
       <span class="close" onclick="closeModal()">&times;</span>
       <h2>Batch Details</h2>
-      <div id="modalData"></div>
-      <button class="print-btn" onclick="printModal()">Print</button>
+      <div id="modalDetails"></div>
+      <button class="print-btn" onclick="window.print()">Print</button>
     </div>
   </div>
 
   <script>
-    const searchInput = document.getElementById('searchInput');
     const dataRows = document.getElementById('dataRows');
+    const searchInput = document.getElementById('searchInput');
+    const timeline = document.getElementById('timeline');
+    const detailModal = document.getElementById('detailModal');
+    const modalDetails = document.getElementById('modalDetails');
+
     let allData = [];
 
     fetch('php/trackmeat.php')
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
         allData = data;
         displayData(allData);
-      })
-      .catch(error => {
-        console.error("Error fetching real data:", error);
+        updateTimeline(allData[0]); // show first batch timeline initially
       });
 
     function displayData(data) {
       dataRows.innerHTML = '';
-      data.forEach(row => {
+      data.forEach(item => {
         const div = document.createElement('div');
         div.className = 'table-row';
         div.innerHTML = `
-          <span>${row.batch_id}</span>
-          <span>${row.date_processed}</span>
-          <span>${row.processed_batch_id || ''}</span>
-          <span>${row.quality || ''}</span>
-          <span>${row.package_id || ''}</span>
-          <span>${row.package_type || ''}</span>
-          <span>${row.weight || ''}</span>
-          <span>${row.date_packaged || ''}</span>
-          <span>${row.transport_id || ''}</span>
-          <span>${row.vehicle_type || ''}</span>
-          <span>${row.transport_date || ''}</span>
-          <span>${row.product_type || ''}</span>
-          <span>${row.quality_score || ''}</span>
-          <span><button onclick='openModal(${JSON.stringify(row)})'>View</button></span>
+          <span>${item.batch_id}</span>
+          <span>${item.date_processed || ''}</span>
+          <span>${item.processed_batch_id || ''}</span>
+          <span>${item.quality || ''}</span>
+          <span>${item.package_id || ''}</span>
+          <span>${item.package_type || ''}</span>
+          <span>${item.weight || ''}</span>
+          <span>${item.date_packaged || ''}</span>
+          <span>${item.transport_id || ''}</span>
+          <span>${item.vehicle_type || ''}</span>
+          <span>${item.transport_date || ''}</span>
+          <span>${item.product_type || ''}</span>
+          <span>${item.quality_score || ''}</span>
+          <span><button onclick='showDetails(${JSON.stringify(item)})'>View</button></span>
         `;
         dataRows.appendChild(div);
       });
     }
 
-    searchInput.addEventListener('input', () => {
-      const search = searchInput.value.toLowerCase();
-      const filtered = allData.filter(item =>
-        item.batch_id && item.batch_id.toString().toLowerCase().includes(search)
-      );
-      displayData(filtered);
-    });
+    function updateTimeline(batch) {
+      timeline.innerHTML = '';
+      const events = [
+        { name: 'Processing', date: batch.date_processed },
+        { name: 'Packaging', date: batch.date_packaged },
+        { name: 'Transported', date: batch.transport_date }
+      ];
+      events.forEach(ev => {
+        if (ev.date) {
+          const div = document.createElement('div');
+          div.className = 'timeline-event';
+          div.innerHTML = `<h3>${ev.name}</h3><p>Date: ${ev.date}</p>`;
+          timeline.appendChild(div);
+        }
+      });
+    }
 
-    function openModal(data) {
-      const modal = document.getElementById("detailModal");
-      const modalData = document.getElementById("modalData");
-      modalData.innerHTML = `
-        <p><strong>Batch ID:</strong> ${data.batch_id}</p>
-        <p><strong>Process Date:</strong> ${data.date_processed}</p>
-        <p><strong>Processed Batch ID:</strong> ${data.processed_batch_id || ''}</p>
-        <p><strong>Quality:</strong> ${data.quality || ''}</p>
-        <p><strong>Package ID:</strong> ${data.package_id || ''}</p>
-        <p><strong>Package Type:</strong> ${data.package_type || ''}</p>
-        <p><strong>Weight:</strong> ${data.weight || ''}</p>
-        <p><strong>Package Date:</strong> ${data.date_packaged || ''}</p>
-        <p><strong>Transport ID:</strong> ${data.transport_id || ''}</p>
-        <p><strong>Vehicle Type:</strong> ${data.vehicle_type || ''}</p>
-        <p><strong>Transport Date:</strong> ${data.transport_date || ''}</p>
-        <p><strong>Product Type:</strong> ${data.product_type || ''}</p>
-        <p><strong>Quality Score:</strong> ${data.quality_score || ''}</p>
+    function showDetails(batch) {
+      modalDetails.innerHTML = `
+        <p><strong>Batch ID:</strong> ${batch.batch_id}</p>
+        <p><strong>Processed Date:</strong> ${batch.date_processed || ''}</p>
+        <p><strong>Quality:</strong> ${batch.quality || ''}</p>
+        <p><strong>Package ID:</strong> ${batch.package_id || ''}</p>
+        <p><strong>Package Type:</strong> ${batch.package_type || ''}</p>
+        <p><strong>Weight:</strong> ${batch.weight || ''}</p>
+        <p><strong>Transport Date:</strong> ${batch.transport_date || ''}</p>
+        <p><strong>Product Type:</strong> ${batch.product_type || ''}</p>
+        <p><strong>Quality Score:</strong> ${batch.quality_score || ''}</p>
       `;
-      modal.style.display = "block";
+      updateTimeline(batch);
+      detailModal.style.display = 'block';
     }
 
     function closeModal() {
-      document.getElementById("detailModal").style.display = "none";
-    }
-
-    function printModal() {
-      const printContents = document.getElementById('modalData').innerHTML;
-      const originalContents = document.body.innerHTML;
-      document.body.innerHTML = printContents;
-      window.print();
-      document.body.innerHTML = originalContents;
-      location.reload(); // Refresh to rebind events
+      detailModal.style.display = 'none';
     }
 
     window.onclick = function(event) {
-      const modal = document.getElementById("detailModal");
-      if (event.target == modal) {
+      if (event.target == detailModal) {
         closeModal();
       }
-    }
+    };
+
+    searchInput.addEventListener('input', () => {
+      const val = searchInput.value.toLowerCase();
+      const filtered = allData.filter(item => item.batch_id && item.batch_id.toString().toLowerCase().includes(val));
+      displayData(filtered);
+      if (filtered.length > 0) updateTimeline(filtered[0]);
+      else timeline.innerHTML = '<p>No matching records for timeline.</p>';
+    });
   </script>
 </body>
 </html>
