@@ -4,53 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TrackNGrade</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
     }
-
 
     body, html {
       height: 100%;
-      background: #f9f9f9;
+      background: #f0f2f5;
     }
-
 
     .container {
       display: flex;
       height: 100vh;
     }
 
-
     .sidebar {
-      width: 150px;
+      width: 180px;
       background: #1f2329;
       color: white;
-      padding: 10px;
+      padding: 20px;
     }
-
 
     .logo {
+      font-size: 1.3rem;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
-
 
     .sidebar ul {
       list-style: none;
-      padding: 0;
     }
-
 
     .sidebar li {
-      margin: 15px 0;
+      margin: 20px 0;
       cursor: pointer;
     }
-
 
     .main {
       flex: 1;
@@ -58,78 +50,125 @@
       flex-direction: column;
     }
 
-
     .top-bar {
       background: #1f2329;
-      height: 40px;
+      height: 50px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      padding: 0 10px;
+      padding: 0 20px;
     }
-
 
     .user-btn {
       background: #6c757d;
       color: white;
       border: none;
-      padding: 5px 10px;
+      padding: 6px 12px;
       border-radius: 4px;
       cursor: pointer;
     }
 
-
     .content {
-      padding: 20px;
-      background: white;
+      padding: 30px;
       flex-grow: 1;
-      overflow: auto;
+      background: white;
+      overflow-y: auto;
     }
-
 
     h1 {
-      margin-bottom: 10px;
-      font-size: 20px;
+      font-size: 22px;
+      margin-bottom: 20px;
     }
-
 
     .search-bar {
       width: 100%;
-      padding: 8px;
-      margin-bottom: 20px;
+      padding: 10px;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 16px;
     }
-
 
     .table-header, .table-row {
       display: grid;
-      grid-template-columns: repeat(12, minmax(80px, 1fr));
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
+      grid-template-columns: repeat(13, minmax(100px, 1fr)) 100px;
+      padding: 12px;
+      align-items: center;
     }
-
 
     .table-header {
-      background: #f0f0f0;
+      background: #f1f3f5;
       font-weight: bold;
+      border-bottom: 2px solid #ddd;
     }
 
+    .table-row {
+      background: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .table-row:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    .table-row button {
+      padding: 6px 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
     .timeline {
-      border: 1px solid #ccc;
-      padding: 10px;
-      background: #fdfdfd;
+      margin-top: 30px;
       font-weight: bold;
-      margin-top: 20px;
     }
 
+    /* Modal styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
 
-    .chart-container {
-      margin-top: 30px;
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
       padding: 20px;
-      background: #fff;
-      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 60%;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+    }
+
+    .modal-content p {
+      margin: 8px 0;
+    }
+
+    .close {
+      float: right;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .print-btn {
+      margin-top: 20px;
+      background: #28a745;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -155,7 +194,7 @@
       <section class="content">
         <h1>Meat Tracking Through Supply Chain</h1>
         <input type="text" placeholder="Search by Batch ID..." class="search-bar" id="searchInput" />
-        
+
         <div class="table-header">
           <span>Batch ID</span>
           <span>Process Date</span>
@@ -168,44 +207,41 @@
           <span>Transport ID</span>
           <span>Vehicle Type</span>
           <span>Transport Date</span>
+          <span>Product Type</span>
+          <span>Quality Score</span>
           <span>Actions</span>
         </div>
         <div id="dataRows"></div>
 
-
-        <div class="timeline">
-          Supply Chain Timeline
-        </div>
-
-
-        <div class="chart-container">
-          <h2>Average Quality Score by Product Type</h2>
-          <canvas id="qualityChart" height="100"></canvas>
-        </div>
+        <div class="timeline">Supply Chain Timeline</div>
       </section>
     </main>
   </div>
 
+  <!-- Modal -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content" id="modalContent">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Batch Details</h2>
+      <div id="modalData"></div>
+      <button class="print-btn" onclick="printModal()">Print</button>
+    </div>
+  </div>
 
   <script>
     const searchInput = document.getElementById('searchInput');
     const dataRows = document.getElementById('dataRows');
     let allData = [];
 
-
-    // Fetch and load data
     fetch('php/trackmeat.php')
-      .then(res => res.json())
+      .then(response => response.json())
       .then(data => {
-        console.log("Fetched Data:", data); // Debug
         allData = data;
         displayData(allData);
-        renderChart(allData);
       })
-      .catch(err => {
-        console.error("Error fetching data:", err);
+      .catch(error => {
+        console.error("Error fetching real data:", error);
       });
-
 
     function displayData(data) {
       dataRows.innerHTML = '';
@@ -224,14 +260,14 @@
           <span>${row.transport_id || ''}</span>
           <span>${row.vehicle_type || ''}</span>
           <span>${row.transport_date || ''}</span>
-          <span><button>View</button></span>
+          <span>${row.product_type || ''}</span>
+          <span>${row.quality_score || ''}</span>
+          <span><button onclick='openModal(${JSON.stringify(row)})'>View</button></span>
         `;
         dataRows.appendChild(div);
       });
     }
 
-
-    // Search filter
     searchInput.addEventListener('input', () => {
       const search = searchInput.value.toLowerCase();
       const filtered = allData.filter(item =>
@@ -240,61 +276,46 @@
       displayData(filtered);
     });
 
+    function openModal(data) {
+      const modal = document.getElementById("detailModal");
+      const modalData = document.getElementById("modalData");
+      modalData.innerHTML = `
+        <p><strong>Batch ID:</strong> ${data.batch_id}</p>
+        <p><strong>Process Date:</strong> ${data.date_processed}</p>
+        <p><strong>Processed Batch ID:</strong> ${data.processed_batch_id || ''}</p>
+        <p><strong>Quality:</strong> ${data.quality || ''}</p>
+        <p><strong>Package ID:</strong> ${data.package_id || ''}</p>
+        <p><strong>Package Type:</strong> ${data.package_type || ''}</p>
+        <p><strong>Weight:</strong> ${data.weight || ''}</p>
+        <p><strong>Package Date:</strong> ${data.date_packaged || ''}</p>
+        <p><strong>Transport ID:</strong> ${data.transport_id || ''}</p>
+        <p><strong>Vehicle Type:</strong> ${data.vehicle_type || ''}</p>
+        <p><strong>Transport Date:</strong> ${data.transport_date || ''}</p>
+        <p><strong>Product Type:</strong> ${data.product_type || ''}</p>
+        <p><strong>Quality Score:</strong> ${data.quality_score || ''}</p>
+      `;
+      modal.style.display = "block";
+    }
 
-    function renderChart(data) {
-      const averages = {};
-      const counts = {};
+    function closeModal() {
+      document.getElementById("detailModal").style.display = "none";
+    }
 
+    function printModal() {
+      const printContents = document.getElementById('modalData').innerHTML;
+      const originalContents = document.body.innerHTML;
+      document.body.innerHTML = printContents;
+      window.print();
+      document.body.innerHTML = originalContents;
+      location.reload(); // Refresh to rebind events
+    }
 
-      data.forEach(item => {
-        const type = item.product_type?.trim();
-        const score = parseFloat(item.quality_score);
-        if (type && !isNaN(score)) {
-          averages[type] = (averages[type] || 0) + score;
-          counts[type] = (counts[type] || 0) + 1;
-        }
-      });
-
-
-      const labels = Object.keys(averages);
-      const avgScores = labels.map(type => (averages[type] / counts[type]).toFixed(2));
-
-
-      if (labels.length === 0) {
-        console.warn("No valid product_type or quality_score found.");
-        return;
+    window.onclick = function(event) {
+      const modal = document.getElementById("detailModal");
+      if (event.target == modal) {
+        closeModal();
       }
-
-
-      const ctx = document.getElementById('qualityChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Average Quality Score',
-            data: avgScores,
-            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100
-            }
-          }
-        }
-      });
     }
   </script>
 </body>
 </html>
-
-
-
-
-
