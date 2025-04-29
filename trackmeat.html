@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TrackNGrade</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body, html {
+      height: 100%;
+      background: #f9f9f9;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 150px;
+      background: #1f2329;
+      color: white;
+      padding: 10px;
+    }
+
+    .logo {
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      margin: 15px 0;
+      cursor: pointer;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-bar {
+      background: #1f2329;
+      height: 40px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    .user-btn {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .content {
+      padding: 20px;
+      background: white;
+      flex-grow: 1;
+      overflow: auto;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .table-header, .table-row {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(80px, 1fr));
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .table-header {
+      background: #f0f0f0;
+      font-weight: bold;
+    }
+
+    .timeline {
+      border: 1px solid #ccc;
+      padding: 10px;
+      background: #fdfdfd;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .chart-container {
+      margin-top: 30px;
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo">TrackNGrade</div>
+      <nav>
+        <ul>
+          <li>Grading Standards</li>
+          <li>Reports</li>
+          <li>Meat Tracking</li>
+          <li>Quality Analysis</li>
+          <li>Packaging Oversight</li>
+          <li>Transport Monitoring</li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="main">
+      <header class="top-bar">
+        <button class="user-btn">User ▼</button>
+      </header>
+      <section class="content">
+        <h1>Meat Tracking Through Supply Chain</h1>
+        <input type="text" placeholder="Search by Batch ID..." class="search-bar" id="searchInput" />
+        <div class="table-header">
+          <span>Batch ID</span>
+          <span>Process Date</span>
+          <span>Processed Batch ID</span>
+          <span>Quality</span>
+          <span>Package ID</span>
+          <span>Package Type</span>
+          <span>Weight</span>
+          <span>Package Date</span>
+          <span>Transport ID</span>
+          <span>Vehicle Type</span>
+          <span>Transport Date</span>
+          <span>Actions</span>
+        </div>
+        <div id="dataRows"></div>
+
+        <div class="timeline">
+          Supply Chain Timeline
+        </div>
+
+        <div class="chart-container">
+          <h2>Average Quality Score by Product Type</h2>
+          <canvas id="qualityChart" height="100"></canvas>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const dataRows = document.getElementById('dataRows');
+    let allData = [];
+
+    // Load data from PHP
+    fetch('php/trackmeat.php')
+      .then(res => res.json())
+      .then(data => {
+        allData = data;
+        displayData(allData);
+        renderChart(allData);
+      });
+
+    function displayData(data) {
+      dataRows.innerHTML = '';
+      data.forEach(row => {
+        const div = document.createElement('div');
+        div.className = 'table-row';
+        div.innerHTML = `
+          <span>${row.batch_id}</span>
+          <span>${row.date_processed}</span>
+          <span>${row.processed_batch_id || ''}</span>
+          <span>${row.quality || ''}</span>
+          <span>${row.package_id || ''}</span>
+          <span>${row.package_type || ''}</span>
+          <span>${row.weight || ''}</span>
+          <span>${row.date_packaged || ''}</span>
+          <span>${row.transport_id || ''}</span>
+          <span>${row.vehicle_type || ''}</span>
+          <span>${row.transport_date || ''}</span>
+          <span><button>View</button></span>
+        `;
+        dataRows.appendChild(div);
+      });
+    }
+
+    // Filter ONLY by batch ID
+    searchInput.addEventListener('input', () => {
+      const search = searchInput.value.toLowerCase();
+      const filtered = allData.filter(item =>
+        item.batch_id && item.batch_id.toString().toLowerCase().includes(search)
+      );
+      displayData(filtered);
+    });
+
+    function renderChart(data) {
+      const averages = {};
+      const counts = {};
+
+      data.forEach(item => {
+        const type = item.product_type;
+        const score = parseFloat(item.quality_score);
+        if (!isNaN(score)) {
+          averages[type] = (averages[type] || 0) + score;
+          counts[type] = (counts[type] || 0) + 1;
+        }
+      });
+
+      const labels = Object.keys(averages);
+      const avgScores = labels.map(type => (averages[type] / counts[type]).toFixed(2));
+
+      new Chart(document.getElementById('qualityChart'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Average Quality Score',
+            data: avgScores,
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
