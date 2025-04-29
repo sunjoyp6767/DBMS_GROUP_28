@@ -13,28 +13,16 @@
       font-family: Arial, sans-serif;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     body, html {
       height: 100%;
       background: #f9f9f9;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .container {
       display: flex;
       height: 100vh;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .sidebar {
       width: 150px;
       background: #1f2329;
@@ -42,47 +30,27 @@
       padding: 10px;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .logo {
       font-weight: bold;
       margin-bottom: 20px;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .sidebar ul {
       list-style: none;
       padding: 0;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .sidebar li {
       margin: 15px 0;
       cursor: pointer;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .main {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .top-bar {
       background: #1f2329;
       height: 40px;
@@ -92,10 +60,6 @@
       padding: 0 10px;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .user-btn {
       background: #6c757d;
       color: white;
@@ -105,10 +69,6 @@
       cursor: pointer;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .content {
       padding: 20px;
       background: white;
@@ -116,19 +76,11 @@
       overflow: auto;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     h1 {
       margin-bottom: 10px;
       font-size: 20px;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .search-bar {
       width: 100%;
       padding: 8px;
@@ -137,10 +89,6 @@
       border-radius: 4px;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .table-header, .table-row {
       display: grid;
       grid-template-columns: repeat(12, minmax(80px, 1fr));
@@ -148,19 +96,11 @@
       border-bottom: 1px solid #ddd;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .table-header {
       background: #f0f0f0;
       font-weight: bold;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .timeline {
       border: 1px solid #ccc;
       padding: 10px;
@@ -169,10 +109,6 @@
       margin-top: 20px;
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     .chart-container {
       margin-top: 30px;
       padding: 20px;
@@ -219,18 +155,10 @@
         </div>
         <div id="dataRows"></div>
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
         <div class="timeline">
           Supply Chain Timeline
         </div>
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
         <div class="chart-container">
           <h2>Average Quality Score by Product Type</h2>
           <canvas id="qualityChart" height="100"></canvas>
@@ -239,19 +167,11 @@
     </main>
   </div>
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
   <script>
     const searchInput = document.getElementById('searchInput');
     const dataRows = document.getElementById('dataRows');
     let allData = [];
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     // Load data from PHP
     fetch('php/trackmeat.php')
       .then(res => res.json())
@@ -261,16 +181,12 @@
         renderChart(allData);
       });
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     function displayData(data) {
       dataRows.innerHTML = '';
       data.forEach(row => {
         const div = document.createElement('div');
         div.className = 'table-row';
-        div.innerHTML = `
+        div.innerHTML = 
           <span>${row.batch_id}</span>
           <span>${row.date_processed}</span>
           <span>${row.processed_batch_id || ''}</span>
@@ -283,15 +199,11 @@
           <span>${row.vehicle_type || ''}</span>
           <span>${row.transport_date || ''}</span>
           <span><button>View</button></span>
-        `;
+        ;
         dataRows.appendChild(div);
       });
     }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     // Filter ONLY by batch ID
     searchInput.addEventListener('input', () => {
       const search = searchInput.value.toLowerCase();
@@ -301,18 +213,10 @@
       displayData(filtered);
     });
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     function renderChart(data) {
       const averages = {};
       const counts = {};
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
       data.forEach(item => {
         const type = item.product_type;
         const score = parseFloat(item.quality_score);
@@ -322,17 +226,9 @@
         }
       });
 
-<<<<<<< Updated upstream
       const labels = Object.keys(averages);
       const avgScores = labels.map(type => (averages[type] / counts[type]).toFixed(2));
 
-=======
-
-      const labels = Object.keys(averages);
-      const avgScores = labels.map(type => (averages[type] / counts[type]).toFixed(2));
-
-
->>>>>>> Stashed changes
       new Chart(document.getElementById('qualityChart'), {
         type: 'bar',
         data: {
@@ -359,7 +255,3 @@
   </script>
 </body>
 </html>
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
