@@ -57,15 +57,17 @@
     </div>
   </nav>
 
+
   <div class="d-flex">
     <div class="collapse d-lg-block sidebar" id="sidebarMenu">
       <a href="#" onclick="showSection('grading')">Grading Standards</a>
       <a href="#" onclick="showSection('reports')">Reports</a>
-      <a href="#" onclick="showSection('tracking')">Meat Tracking</a>
+      <a href="trackmeat.html">Meat Tracking</a>
       <a href="#" onclick="showSection('quality')">Quality Analysis</a>
       <a href="#" onclick="showSection('packaging')">Packaging Oversight</a>
       <a href="#" onclick="showSection('transport')">Transport Monitoring</a>
     </div>
+
 
     <div class="container-fluid p-4">
       <div id="dashboard-sections">
@@ -73,6 +75,7 @@
         <div id="reports" class="section d-none"> <h3>Reports</h3> </div>
         <div id="tracking" class="section d-none"> <h3>Meat Tracking</h3> </div>
         <div id="quality" class="section d-none"> <h3>Quality Analysis</h3> </div>
+
 
         <div id="packaging" class="section">
           <h3>Packaging Oversight</h3>
@@ -98,7 +101,7 @@
               <button class="btn btn-primary w-100" onclick="filterPackagingTable()">Filter</button>
             </div>
           </div>
-        
+       
           <div class="table-responsive">
             <table class="table table-striped" id="packagingTable">
               <thead>
@@ -117,7 +120,7 @@
               <tbody></tbody>
             </table>
           </div>
-        
+       
           <div class="card mt-3">
             <div class="card-header">
               <h5>Add New Package</h5>
@@ -152,7 +155,7 @@
               </div>
             </div>
           </div>
-        
+       
           <div class="row mt-3">
             <div class="col-md-6">
               <div class="card">
@@ -181,6 +184,7 @@
           </div>
         </div>
 
+
         <div id="transport" class="section d-none">
           <h3>Transport Monitoring</h3>
           <input type="text" id="transportSearch" class="form-control mb-2" placeholder="Search Transport..." onkeyup="updateTransportUI()">
@@ -208,6 +212,7 @@
     </div>
   </div>
 
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     let currentSection = 'grading';
@@ -215,6 +220,7 @@
     let transportMarkers = [];
     let transportData = [];
     let transportConditionsChart;
+
 
     function loadAllSections() {
       loadGradingStandards();
@@ -224,6 +230,7 @@
       loadPackagingData();
       loadTransportData();
     }
+
 
     function initializeUser() {
       const username = localStorage.getItem("username") || "User";
@@ -247,13 +254,14 @@
       }).addTo(map);
     }
 
+
     function loadPackagingData() {
     fetch('php/get_packaging_data.php')
       .then(response => response.json())
       .then(data => {
         const tableBody = document.querySelector('#packagingTable tbody');
         tableBody.innerHTML = '';
-  
+ 
         data.forEach(item => {
           const row = document.createElement('tr');
           row.innerHTML = `
@@ -272,7 +280,7 @@
           `;
           tableBody.appendChild(row);
         });
-  
+ 
         // Populate batch dropdown
         const batchSelect = document.getElementById('pkgBatchId');
         batchSelect.innerHTML = '<option value="">Select Batch</option>';
@@ -283,10 +291,11 @@
           option.textContent = `Batch ${id}`;
           batchSelect.appendChild(option);
         });
-  
+ 
         updatePackagingChart(data);
       });
   }
+
 
   function addPackaging() {
     const batchId = document.getElementById('pkgBatchId').value;
@@ -294,19 +303,19 @@
     const weight = document.getElementById('pkgWeight').value;
     const date = document.getElementById('pkgDate').value;
     const zip = document.getElementById('pkgZip').value;
-  
+ 
     if (!batchId || !pkgType || !weight || !date || !zip) {
       alert('Please fill all fields');
       return;
     }
-  
+ 
     const formData = new FormData();
     formData.append('batch_id', batchId);
     formData.append('package_type', pkgType);
     formData.append('weight', weight);
     formData.append('date_packaged', date);
     formData.append('zip', zip);
-  
+ 
     fetch('php/add_package.php', {
       method: 'POST',
       body: formData
@@ -324,37 +333,39 @@
       });
   }
 
+
   function filterPackagingTable() {
     const search = document.getElementById('packagingSearch').value.toLowerCase();
     const type = document.getElementById('packagingTypeFilter').value;
     const minWeight = parseFloat(document.getElementById('packagingWeightFrom').value) || 0;
     const maxWeight = parseFloat(document.getElementById('packagingWeightTo').value) || Infinity;
-  
+ 
     const rows = document.querySelectorAll('#packagingTable tbody tr');
-  
+ 
     rows.forEach(row => {
       const rowText = row.textContent.toLowerCase();
       const rowType = row.cells[3].textContent;
       const weight = parseFloat(row.cells[4].textContent) || 0;
-  
+ 
       const matchText = !search || rowText.includes(search);
       const matchType = !type || rowType === type;
       const matchWeight = weight >= minWeight && weight <= maxWeight;
-  
+ 
       row.style.display = (matchText && matchType && matchWeight) ? '' : 'none';
     });
   }
 
+
   function updatePackagingChart(data) {
     const typeCounts = { 'Vacuum Sealed': 0, 'Frozen': 0, 'Chilled': 0 };
-  
+ 
     data.forEach(item => {
       const type = item.package_type;
       if (typeCounts[type] !== undefined) {
         typeCounts[type]++;
       }
     });
-  
+ 
     const typeCtx = document.getElementById('packagingTypeChart').getContext('2d');
     new Chart(typeCtx, {
       type: 'doughnut',
@@ -370,12 +381,12 @@
         maintainAspectRatio: false
       }
     });
-  
+ 
     const monthCounts = {
       Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0,
       Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0
     };
-  
+ 
     data.forEach(item => {
       if (item.date_packaged) {
         const date = new Date(item.date_packaged);
@@ -385,7 +396,7 @@
         }
       }
     });
-  
+ 
     const volumeCtx = document.getElementById('packagingVolumeChart').getContext('2d');
     new Chart(volumeCtx, {
       type: 'bar',
@@ -409,19 +420,20 @@
     });
   }
 
+
   function editPackage(id) {
     const row = [...document.querySelectorAll('#packagingTable tbody tr')].find(r => r.cells[0].textContent == id);
     if (!row) return alert('Package not found.');
-  
+ 
     document.getElementById('editPkgId').value = id;
     document.getElementById('editPkgType').value = row.cells[3].textContent;
     document.getElementById('editPkgWeight').value = row.cells[4].textContent;
     document.getElementById('editPkgDate').value = row.cells[5].textContent;
     document.getElementById('editPkgZip').value = row.cells[6].textContent;
-  
+ 
     new bootstrap.Modal(document.getElementById('editPackageModal')).show();
   }
-  
+ 
   document.getElementById('editPackageForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const id = document.getElementById('editPkgId').value;
@@ -431,7 +443,7 @@
     data.append('weight', document.getElementById('editPkgWeight').value);
     data.append('date_packaged', document.getElementById('editPkgDate').value);
     data.append('zip', document.getElementById('editPkgZip').value);
-  
+ 
     fetch('php/update_package.php', {
       method: 'POST',
       body: data
@@ -448,6 +460,7 @@
       });
   });
 
+
   function deletePackage(id) {
     if (confirm('Are you sure you want to delete this package?')) {
       fetch('php/delete_package.php?id=' + id)
@@ -462,9 +475,11 @@
     }
   }
 
+
   document.getElementById('packagingSearch').addEventListener('input', function () {
     const searchValue = this.value.toLowerCase();
     const rows = document.querySelectorAll('#packagingTable tbody tr');
+
 
     rows.forEach(row => {
     const text = row.textContent.toLowerCase();
@@ -474,3 +489,6 @@
   </script>
 </body>
 </html>
+
+
+
