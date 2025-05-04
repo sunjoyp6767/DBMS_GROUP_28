@@ -140,7 +140,7 @@
 
     .modal-content {
       background-color: #fff;
-      margin: 10% auto;
+      margin: 5% auto;
       padding: 20px;
       border-radius: 8px;
       width: 60%;
@@ -169,6 +169,30 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+    }
+
+    /* Timeline styles inside modal */
+    .timeline-container {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .timeline-step {
+      padding: 10px;
+      background: #e0f7fa;
+      border: 1px solid #00acc1;
+      border-radius: 6px;
+      text-align: center;
+      width: 120px;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    .timeline-arrow {
+      font-size: 18px;
+      margin-right: 10px;
+      color: #555;
     }
   </style>
 </head>
@@ -213,7 +237,7 @@
         </div>
         <div id="dataRows"></div>
 
-        <div class="timeline">Supply Chain Timeline</div>
+        <div class="timeline" id="timelineContainer">Supply Chain Timeline</div>
       </section>
     </main>
   </div>
@@ -293,6 +317,13 @@
         <p><strong>Transport Date:</strong> ${data.transport_date || ''}</p>
         <p><strong>Product Type:</strong> ${data.product_type || ''}</p>
         <p><strong>Quality Score:</strong> ${data.quality_score || ''}</p>
+        <div class="timeline-container">
+          <div class="timeline-step">Processing<br><small>${data.date_processed}</small></div>
+          <div class="timeline-arrow">➜</div>
+          <div class="timeline-step">Packaging<br><small>${data.date_packaged || '-'}</small></div>
+          <div class="timeline-arrow">➜</div>
+          <div class="timeline-step">Transport<br><small>${data.transport_date || '-'}</small></div>
+        </div>
       `;
       modal.style.display = "block";
     }
