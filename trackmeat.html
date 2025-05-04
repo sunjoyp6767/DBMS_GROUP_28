@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TrackNGrade</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -14,7 +15,8 @@
 
     body, html {
       height: 100%;
-      background: #f0f2f5;
+      background: #f5f7fa;
+      color: #333;
     }
 
     .container {
@@ -23,16 +25,18 @@
     }
 
     .sidebar {
-      width: 180px;
-      background: #1f2329;
-      color: white;
-      padding: 20px;
+      width: 200px;
+      background: #21252b;
+      color: #fff;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
     }
 
     .logo {
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       font-weight: bold;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
 
     .sidebar ul {
@@ -42,6 +46,11 @@
     .sidebar li {
       margin: 20px 0;
       cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .sidebar li:hover {
+      color: #61dafb;
     }
 
     .main {
@@ -51,64 +60,68 @@
     }
 
     .top-bar {
-      background: #1f2329;
-      height: 50px;
+      background: #ffffff;
+      height: 60px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      padding: 0 20px;
+      padding: 0 30px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
     .user-btn {
-      background: #6c757d;
+      background: #007bff;
       color: white;
       border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
+      padding: 8px 16px;
+      border-radius: 20px;
       cursor: pointer;
+      font-weight: 500;
     }
 
     .content {
       padding: 30px;
       flex-grow: 1;
-      background: white;
       overflow-y: auto;
     }
 
     h1 {
-      font-size: 22px;
-      margin-bottom: 20px;
+      font-size: 26px;
+      margin-bottom: 25px;
     }
 
     .search-bar {
       width: 100%;
-      padding: 10px;
+      padding: 12px 16px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-bottom: 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
       font-size: 16px;
     }
 
     .table-header, .table-row {
       display: grid;
       grid-template-columns: repeat(13, minmax(100px, 1fr)) 100px;
-      padding: 12px;
+      padding: 14px;
       align-items: center;
     }
 
     .table-header {
-      background: #f1f3f5;
+      background: #f0f2f5;
       font-weight: bold;
       border-bottom: 2px solid #ddd;
     }
 
     .table-row {
-      background: #ffffff;
-      border-bottom: 1px solid #e0e0e0;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 10px;
+      transition: transform 0.2s;
     }
 
-    .table-row:nth-child(even) {
-      background: #f9f9f9;
+    .table-row:hover {
+      transform: scale(1.005);
     }
 
     .table-row button {
@@ -121,11 +134,11 @@
     }
 
     .timeline {
-      margin-top: 30px;
+      margin-top: 40px;
+      font-size: 18px;
       font-weight: bold;
     }
 
-    /* Modal styling */
     .modal {
       display: none;
       position: fixed;
@@ -141,37 +154,45 @@
     .modal-content {
       background-color: #fff;
       margin: 5% auto;
-      padding: 20px;
-      border-radius: 8px;
+      padding: 30px;
+      border-radius: 12px;
       width: 60%;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      max-width: 800px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
     .modal-content h2 {
       margin-bottom: 20px;
+      font-size: 22px;
     }
 
     .modal-content p {
       margin: 8px 0;
+      font-size: 15px;
     }
 
     .close {
       float: right;
-      font-size: 22px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #888;
       cursor: pointer;
+    }
+
+    .close:hover {
+      color: #000;
     }
 
     .print-btn {
       margin-top: 20px;
       background: #28a745;
       color: white;
-      padding: 8px 16px;
+      padding: 10px 18px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
 
-    /* Timeline styles inside modal */
     .timeline-container {
       display: flex;
       align-items: center;
@@ -180,11 +201,11 @@
 
     .timeline-step {
       padding: 10px;
-      background: #e0f7fa;
-      border: 1px solid #00acc1;
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
       border-radius: 6px;
       text-align: center;
-      width: 120px;
+      width: 140px;
       font-size: 14px;
       margin-right: 10px;
     }
@@ -213,7 +234,7 @@
     </aside>
     <main class="main">
       <header class="top-bar">
-        <button class="user-btn">User ▼</button>
+        <button class="user-btn">Naziha ▼</button>
       </header>
       <section class="content">
         <h1>Meat Tracking Through Supply Chain</h1>
@@ -237,7 +258,8 @@
         </div>
         <div id="dataRows"></div>
 
-        <div class="timeline" id="timelineContainer">Supply Chain Timeline</div>
+        <h2 style="margin-top: 40px;">Batch Count by Product Type</h2>
+        <canvas id="productTypeChart" height="100"></canvas>
       </section>
     </main>
   </div>
@@ -262,6 +284,7 @@
       .then(data => {
         allData = data;
         displayData(allData);
+        renderProductTypeChart(allData);
       })
       .catch(error => {
         console.error("Error fetching real data:", error);
@@ -298,6 +321,7 @@
         item.batch_id && item.batch_id.toString().toLowerCase().includes(search)
       );
       displayData(filtered);
+      renderProductTypeChart(filtered);
     });
 
     function openModal(data) {
@@ -338,7 +362,7 @@
       document.body.innerHTML = printContents;
       window.print();
       document.body.innerHTML = originalContents;
-      location.reload(); // Refresh to rebind events
+      location.reload();
     }
 
     window.onclick = function(event) {
@@ -346,6 +370,51 @@
       if (event.target == modal) {
         closeModal();
       }
+    }
+
+    function renderProductTypeChart(data) {
+      const counts = {};
+      data.forEach(row => {
+        const type = row.product_type || 'Unknown';
+        counts[type] = (counts[type] || 0) + 1;
+      });
+
+      const labels = Object.keys(counts);
+      const values = Object.values(counts);
+
+      const ctx = document.getElementById('productTypeChart').getContext('2d');
+      if (window.productTypeChart) {
+        window.productTypeChart.destroy();
+      }
+      window.productTypeChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Batch Count',
+            data: values,
+            backgroundColor: '#007bff'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: 'Product Types in Batches'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { precision: 0 }
+            }
+          }
+        }
+      });
     }
   </script>
 </body>
