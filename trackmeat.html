@@ -69,6 +69,11 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
+    .user-menu {
+      position: relative;
+      display: inline-block;
+    }
+
     .user-btn {
       background: #007bff;
       color: white;
@@ -77,6 +82,29 @@
       border-radius: 20px;
       cursor: pointer;
       font-weight: 500;
+    }
+
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 120px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+      border-radius: 6px;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .dropdown a {
+      color: #333;
+      padding: 10px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown a:hover {
+      background-color: #f1f1f1;
     }
 
     .content {
@@ -234,7 +262,12 @@
     </aside>
     <main class="main">
       <header class="top-bar">
-        <button class="user-btn">Naziha ▼</button>
+        <div class="user-menu">
+          <button class="user-btn" onclick="toggleDropdown()">Naziha ▼</button>
+          <div class="dropdown" id="userDropdown">
+            <a href="index.html">Log Out</a>
+          </div>
+        </div>
       </header>
       <section class="content">
         <h1>Meat Tracking Through Supply Chain</h1>
@@ -416,6 +449,18 @@
         }
       });
     }
+
+    function toggleDropdown() {
+      const dropdown = document.getElementById("userDropdown");
+      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    }
+
+    window.addEventListener('click', function(e) {
+      const userMenu = document.querySelector('.user-menu');
+      if (!userMenu.contains(e.target)) {
+        document.getElementById("userDropdown").style.display = "none";
+      }
+    });
   </script>
 </body>
 </html>
