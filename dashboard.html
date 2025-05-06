@@ -846,6 +846,33 @@ function renderReportsTable(data) {
     tableBody.appendChild(row);
   });
 }
+function loadQualityReports() {
+      fetch('php/get_quality_reports.php')
+        .then(response => response.json())
+        .then(data => {
+          const tableBody = document.querySelector('#reportsTable tbody');
+          tableBody.innerHTML = '';
+          
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.product_name}</td>
+              <td>${item.description}</td>
+              <td>${item.quality_score}</td>
+              <td>${item.final_weight || 'N/A'}</td>
+              <td>${item.slaughterhouse_name || 'N/A'}</td>
+              <td>${item.health_inspection_report || 'N/A'}</td>
+              <td>${item.processing_time || 'N/A'}</td>
+              <td>
+                <button class="btn btn-sm btn-info" onclick="viewReportDetails(${item.grade_id})">Details</button>
+              </td>
+            `;
+            tableBody.appendChild(row);
+          });
+          
+          updateReportCharts(data);
+        });
+    }
 
 function updateReportUI() {
   const search = document.getElementById('reportsSearch').value.toLowerCase();
