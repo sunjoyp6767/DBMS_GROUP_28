@@ -317,18 +317,18 @@
       }).addTo(map);
     }
 
-    function filterPackagingTable() {
-  const tableRows = document.querySelectorAll('#packagingTable tbody tr'); // ✅ now fresh every time
+  function filterPackagingTable() {
   const search = document.getElementById('packagingSearch').value.toLowerCase();
   const type = document.getElementById('packagingTypeFilter').value;
   const minWeight = parseFloat(document.getElementById('packagingWeightFrom').value) || 0;
   const maxWeight = parseFloat(document.getElementById('packagingWeightTo').value) || Infinity;
 
-  tableRows.forEach(row => {
-    const cells = row.children;
+  const rows = document.querySelectorAll('#packagingTable tbody tr');
+
+  rows.forEach(row => {
     const rowText = row.textContent.toLowerCase();
-    const rowType = cells[3].textContent;
-    const weight = parseFloat(cells[4].textContent);
+    const rowType = row.cells[3].textContent;
+    const weight = parseFloat(row.cells[4].textContent) || 0;
 
     const matchText = !search || rowText.includes(search);
     const matchType = !type || rowType === type;
@@ -535,6 +535,16 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+function debounce(func, timeout = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
+}
+
+// Then modify the event listener:
+document.getElementById('packagingSearch').addEventListener('input', debounce(filterPackagingTable));
 
 
 function editPackage(id) {
@@ -579,6 +589,19 @@ document.getElementById('editPackageForm').addEventListener('submit', function (
       alert('Error: ' + res.message);
     }
   });
+});
+
+// Add this to your DOMContentLoaded event listener
+document.addEventListener("DOMContentLoaded", function () {
+  loadPackagingData();
+  
+  // Add event listeners for dynamic filtering
+  document.getElementById('packagingSearch').addEventListener('input', filterPackagingTable);
+  document.getElementById('packagingTypeFilter').addEventListener('change', filterPackagingTable);
+  document.getElementById('packagingWeightFrom').addEventListener('input', filterPackagingTable);
+  document.getElementById('packagingWeightTo').addEventListener('input', filterPackagingTable);
+  
+  // Rest of your existing code...
 });
 
 </script>
