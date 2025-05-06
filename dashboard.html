@@ -388,11 +388,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    let map, transportMarkers = [], transportData = [], transportChart;
+
     let currentSection = 'grading';
-    let map;
-    let transportMarkers = [];
-    let transportData = [];
-    let transportConditionsChart;
+    
 
 
     function loadAllSections() {
@@ -741,6 +740,29 @@ document.addEventListener("DOMContentLoaded", function () {
   
   // Rest of your existing code...
 });
+
+
+//Transpoart_Monitoring
+ 
+
+  function initMap() {
+    map = L.map('map').setView([23.8103, 90.4125], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    updateTransportMap();
+  }
+
+  function loadTransportData() {
+    fetch('php/get_transport_data.php')
+      .then(res => res.json())
+      .then(data => {
+        transportData = data;
+        updateTransportUI();
+      });
+  }
+
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
