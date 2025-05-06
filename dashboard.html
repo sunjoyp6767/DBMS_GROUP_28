@@ -78,198 +78,450 @@
 
 
     <div class="container-fluid p-4">
-      <div id="dashboard-sections">
-        <div id="grading" class="section"> <h3>Grading Standards</h3> </div>
-        <div id="reports" class="section d-none"> <h3>Reports</h3> </div>
-        <div id="tracking" class="section d-none"> <h3>Meat Tracking</h3> </div>
-        <div id="quality" class="section d-none"> <h3>Quality Analysis</h3> </div>
-
-
-        <div id="packaging" class="section">
-          <h3>Packaging Oversight</h3>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <input type="text" id="packagingSearch" class="form-control mb-2" placeholder="Search packages...">
-            </div>
-            <div class="col-md-2">
-              <select class="form-select" id="packagingTypeFilter">
-                <option value="">All Types</option>
-                <option value="Vacuum Sealed">Vacuum Sealed</option>
-                <option value="Frozen">Frozen</option>
-                <option value="Chilled">Chilled</option>
-              </select>
-            </div>
-            <div class="col-md-2">
-              <input type="number" class="form-control" id="packagingWeightFrom" placeholder="Min Weight">
-            </div>
-            <div class="col-md-2">
-              <input type="number" class="form-control" id="packagingWeightTo" placeholder="Max Weight">
-            </div>
-            <div class="col-md-2">
-              <button class="btn btn-primary w-100" onclick="filterPackagingTable()">Filter</button>
+      <!-- Grading Standards Section -->
+      <div id="grading" class="section">
+        <h3>Grading Standards</h3>
+        <div class="mb-3">
+          <input type="text" id="gradingSearch" class="form-control" placeholder="Search grading standards...">
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped" id="gradingTable">
+            <thead>
+              <tr>
+                <th>Product Type</th>
+                <th>Description</th>
+                <th>Quality Score</th>
+                <th>Avg Weight</th>
+                <th>Texture</th>
+                <th>Grading Date</th>
+                <th>Batch Quantity</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="card mt-3">
+          <div class="card-header">
+            <h5>Add New Grading Standard</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <select class="form-select" id="gradeProductType">
+                  <option value="">Select Product Type</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <input type="text" class="form-control" id="gradeDescription" placeholder="Description">
+              </div>
+              <div class="col-md-4">
+                <select class="form-select" id="gradeQualityScore">
+                  <option value="">Quality Score</option>
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <input type="number" class="form-control" id="gradeAvgWeight" placeholder="Avg Weight">
+              </div>
+              <div class="col-md-3">
+                <input type="text" class="form-control" id="gradeTexture" placeholder="Texture">
+              </div>
+              <div class="col-md-3">
+                <input type="date" class="form-control" id="gradeDate">
+              </div>
+              <div class="col-md-3">
+                <button class="btn btn-primary w-100" onclick="addGradingStandard()">Add Standard</button>
+              </div>
             </div>
           </div>
-          
-          <div class="card mt-3">
-            <div class="card-header">
-              <h5>Add New Package</h5>
-            </div>
-            <div class="card-body">
-              <div class="row g-3">
-                <div class="col-md-3">
-                  <select class="form-select" id="pkgBatchId">
-                    <option value="">Select Batch</option>
-                  </select>
-                </div>
-                <div class="col-md-2">
-                  <select class="form-select" id="pkgType">
-                    <option value="">Package Type</option>
-                    <option value="Vacuum Sealed">Vacuum Sealed</option>
-                    <option value="Frozen">Frozen</option>
-                    <option value="Chilled">Chilled</option>
-                  </select>
-                </div>
-                <div class="col-md-2">
-                  <input type="number" class="form-control" id="pkgWeight" placeholder="Weight">
-                </div>
-                <div class="col-md-2">
-                  <input type="date" class="form-control" id="pkgDate" placeholder="Date">
-                </div>
-                <div class="col-md-2">
-                  <input type="text" class="form-control" id="pkgZip" placeholder="ZIP Code">
-                </div>
-                <div class="col-md-1">
-                  <button class="btn btn-primary w-100" onclick="addPackaging()">Add</button>
+        </div>
+      </div>
+
+      <!-- Reports Section -->
+      <div id="reports" class="section">
+        <h3>Inspector Records & Quality Reports</h3>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <input type="text" class="form-control" id="reportsSearch" placeholder="Search reports...">
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="reportQualityFilter">
+              <option value="">All Qualities</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="reportInspectionFilter">
+              <option value="">All Inspections</option>
+              <option value="Passed">Passed</option>
+              <option value="Failed">Failed</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped" id="reportsTable">
+            <thead>
+              <tr>
+                <th>Product Type</th>
+                <th>Grade Description</th>
+                <th>Quality Score</th>
+                <th>Final Weight</th>
+                <th>Slaughterhouse</th>
+                <th>Inspection</th>
+                <th>Processing Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5>Quality Distribution</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="qualityChart"></canvas>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Edit Package Modal -->
-          <div class="modal fade" id="editPackageModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form id="editPackageForm">
-                  <div class="modal-header">
-                    <h5 class="modal-title">Edit Package</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                  </div>
-                  <div class="modal-body">
-                    <input type="hidden" id="editPkgId">
-                    <div class="mb-3">
-                      <label>Product Type</label>
-                      <input type="text" class="form-control" id="editProductType" placeholder="Product Type">
-                    </div>
-                    <div class="mb-3">
-                      <label>Package Type</label>
-                      <select class="form-select" id="editPkgType">
-                        <option value="Vacuum Sealed">Vacuum Sealed</option>
-                        <option value="Frozen">Frozen</option>
-                        <option value="Chilled">Chilled</option>
-                      </select>
-                    </div>
-                    <div class="mb-3">
-                      <label>Weight (kg)</label>
-                      <input type="number" step="0.1" class="form-control" id="editPkgWeight">
-                    </div>
-                    <div class="mb-3">
-                      <label>Date Packaged</label>
-                      <input type="date" class="form-control" id="editPkgDate">
-                    </div>
-                    <div class="mb-3">
-                      <label>ZIP Code</label>
-                      <input type="text" class="form-control" id="editPkgZip">
-                    </div>
-                    <div class="mb-3">
-                      <label>Quality</label>
-                      <select class="form-select" id="editPkgQuality">
-                        <option value="High">High</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Low">Low</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Save Changes</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                  </div>
-                </form>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5>Inspection Results</h5>
               </div>
-            </div>
-          </div>
-          
-          <div class="table-responsive">
-            <table class="table table-striped" id="packagingTable">
-              <thead>
-                <tr>
-                  <th>Package ID</th>
-                  <th>Batch ID</th>
-                  <th>Product Type</th>
-                  <th>Package Type</th>
-                  <th>Weight</th>
-                  <th>Package Date</th>
-                  <th>Destination ZIP</th>
-                  <th>Quality</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-       
-        
-       
-          <div class="row mt-3">
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-header">
-                  <h5>Packaging by Type</h5>
-                </div>
-                <div class="card-body">
-                  <div class="chart-container">
-                    <canvas id="packagingTypeChart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-header">
-                  <h5>Monthly Packaging Volume</h5>
-                </div>
-                <div class="card-body">
-                  <div class="chart-container">
-                    <canvas id="packagingVolumeChart"></canvas>
-                  </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="inspectionChart"></canvas>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-
-        <div id="transport" class="section d-none">
-          <h3>Transport Monitoring</h3>
-          <input type="text" id="transportSearch" class="form-control mb-2" placeholder="Search Transport..." onkeyup="updateTransportUI()">
-          <table class="table" id="transportTable">
+      <!-- Meat Tracking Section -->
+      <div id="tracking" class="section">
+        <h3>Meat Tracking Through Supply Chain</h3>
+        <div class="mb-3">
+          <input type="text" class="form-control" id="trackingSearch" placeholder="Search batches...">
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped" id="trackingTable">
             <thead>
               <tr>
-                <th>Transport_ID</th><th>Delivery_ID</th><th>Sensor_ID</th><th>Store_ID</th><th>Vehicle_Type</th><th>License_Plate</th><th>Transportation_Date</th><th>Transport_Duration</th><th>Action</th>
+                <th>Batch ID</th>
+                <th>Process Date</th>
+                <th>Processed Batch ID</th>
+                <th>Quality</th>
+                <th>Package ID</th>
+                <th>Package Type</th>
+                <th>Weight</th>
+                <th>Package Date</th>
+                <th>Transport ID</th>
+                <th>Vehicle Type</th>
+                <th>Transport Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
-          <div class="mb-3 row g-2">
-            <input class="form-control col" id="t1" placeholder="Delivery_ID">
-            <input class="form-control col" id="t2" placeholder="Sensor_ID">
-            <input class="form-control col" id="t3" placeholder="Store_ID">
-            <input class="form-control col" id="t4" placeholder="Vehicle_Type">
-            <input class="form-control col" id="t5" placeholder="License_Plate">
-            <input class="form-control col" id="t6" placeholder="Transportation_Date">
-            <input class="form-control col" id="t7" placeholder="Transport_Duration">
-            <button class="btn btn-primary col" onclick="addTransport()">Add</button>
+        </div>
+        <div class="card mt-3">
+          <div class="card-header">
+            <h5>Supply Chain Timeline</h5>
           </div>
-          <div id="map"></div>
+          <div class="card-body">
+            <div class="timeline" id="supplyTimeline"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quality Analysis Section -->
+      <div id="quality" class="section">
+        <h3>Quality Analysis & Problem Identification</h3>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="qualitySearch" placeholder="Search quality data...">
+          </div>
+          <div class="col-md-4">
+            <input type="date" class="form-control" id="qualityDateFrom" placeholder="From Date">
+          </div>
+          <div class="col-md-4">
+            <input type="date" class="form-control" id="qualityDateTo" placeholder="To Date">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card mb-3">
+              <div class="card-header">
+                <h5>Quality Trends Over Time</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="qualityTrendChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h5>Health Issues vs Quality</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped" id="healthQualityTable">
+                    <thead>
+                      <tr>
+                        <th>Health Issue</th>
+                        <th>Treatment</th>
+                        <th>Avg Quality</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card mb-3">
+              <div class="card-header">
+                <h5>Facility Performance</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="facilityChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h5>Problem Facilities</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped" id="problemFacilitiesTable">
+                    <thead>
+                      <tr>
+                        <th>Slaughterhouse</th>
+                        <th>Inspection Result</th>
+                        <th>Processing Time</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Packaging Oversight Section -->
+      <div id="packaging" class="section">
+        <h3>Packaging Oversight</h3>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <input type="text" id="packagingSearch" class="form-control mb-2" placeholder="Search packages...">
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" id="packagingTypeFilter">
+              <option value="">All Types</option>
+              <option value="Vacuum Sealed">Vacuum Sealed</option>
+              <option value="Frozen">Frozen</option>
+              <option value="Chilled">Chilled</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <input type="number" class="form-control" id="packagingWeightFrom" placeholder="Min Weight">
+          </div>
+          <div class="col-md-2">
+            <input type="number" class="form-control" id="packagingWeightTo" placeholder="Max Weight">
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary w-100" onclick="filterPackagingTable()">Filter</button>
+
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped" id="packagingTable">
+            <thead>
+              <tr>
+                <th>Package ID</th>
+                <th>Batch ID</th>
+                <th>Product Type</th>
+                <th>Package Type</th>
+                <th>Weight</th>
+                <th>Package Date</th>
+                <th>Destination ZIP</th>
+                <th>Quality</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="card mt-3">
+          <div class="card-header">
+            <h5>Add New Package</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <select class="form-select" id="pkgBatchId">
+                  <option value="">Select Batch</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="pkgType">
+                  <option value="">Package Type</option>
+                  <option value="Vacuum Sealed">Vacuum Sealed</option>
+                  <option value="Frozen">Frozen</option>
+                  <option value="Chilled">Chilled</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <input type="number" class="form-control" id="pkgWeight" placeholder="Weight">
+              </div>
+              <div class="col-md-2">
+                <input type="date" class="form-control" id="pkgDate" placeholder="Date">
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="pkgZip" placeholder="ZIP Code">
+              </div>
+              <div class="col-md-1">
+                <button class="btn btn-primary w-100" onclick="addPackaging()">Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5>Packaging by Type</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="packagingTypeChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5>Monthly Packaging Volume</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="packagingVolumeChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transport Monitoring Section -->
+      <div id="transport" class="section">
+        <h3>Transport Monitoring</h3>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="transportSearch" placeholder="Search transports...">
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="transportVehicleFilter">
+              <option value="">All Vehicles</option>
+              <option value="Truck">Truck</option>
+              <option value="Van">Van</option>
+              <option value="Refrigerated Truck">Refrigerated Truck</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <input type="date" class="form-control" id="transportDateFilter">
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary w-100" onclick="updateTransportUI()">Filter</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-8">
+            <div class="table-responsive">
+              <table class="table table-striped" id="transportTable">
+                <thead>
+                  <tr>
+                    <th>Transport ID</th>
+                    <th>Vehicle Type</th>
+                    <th>License Plate</th>
+                    <th>Transport Date</th>
+                    <th>Duration</th>
+                    <th>Temperature</th>
+                    <th>Humidity</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="card mt-3">
+              <div class="card-header">
+                <h5>Add New Transport</h5>
+              </div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-3">
+                    <select class="form-select" id="tVehicleType">
+                      <option value="">Vehicle Type</option>
+                      <option value="Truck">Truck</option>
+                      <option value="Van">Van</option>
+                      <option value="Refrigerated Truck">Refrigerated Truck</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <input type="text" class="form-control" id="tLicensePlate" placeholder="License Plate">
+                  </div>
+                  <div class="col-md-3">
+                    <input type="date" class="form-control" id="tTransportDate">
+                  </div>
+                  <div class="col-md-2">
+                    <input type="text" class="form-control" id="tDuration" placeholder="HH:MM:SS">
+                  </div>
+                  <div class="col-md-1">
+                    <button class="btn btn-primary w-100" onclick="addTransport()">Add</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header">
+                <h5>Transport Conditions</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="transportConditionsChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card mt-3">
+          <div class="card-header">
+            <h5>Transport Route Map</h5>
+          </div>
+          <div class="card-body">
+            <div id="map"></div>
+          </div>
         </div>
       </div>
     </div>
