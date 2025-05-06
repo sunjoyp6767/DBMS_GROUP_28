@@ -459,6 +459,35 @@
             <button class="btn btn-primary w-100" onclick="updateTransportUI()">Filter</button>
           </div>
         </div>
+        <div class="card mt-3">
+          <div class="card-header">
+            <h5>Add New Transport</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <select class="form-select" id="tVehicleType">
+                  <option value="">Vehicle Type</option>
+                  <option value="Truck">Truck</option>
+                  <option value="Van">Van</option>
+                  <option value="Refrigerated Truck">Refrigerated Truck</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <input type="text" class="form-control" id="tLicensePlate" placeholder="License Plate">
+              </div>
+              <div class="col-md-3">
+                <input type="date" class="form-control" id="tTransportDate">
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="tDuration" placeholder="HH:MM:SS">
+              </div>
+              <div class="col-md-1">
+                <button class="btn btn-primary w-100" onclick="addTransport()">Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="row">
           <div class="col-md-8">
             <div class="table-responsive">
@@ -478,35 +507,7 @@
                 <tbody></tbody>
               </table>
             </div>
-            <div class="card mt-3">
-              <div class="card-header">
-                <h5>Add New Transport</h5>
-              </div>
-              <div class="card-body">
-                <div class="row g-3">
-                  <div class="col-md-3">
-                    <select class="form-select" id="tVehicleType">
-                      <option value="">Vehicle Type</option>
-                      <option value="Truck">Truck</option>
-                      <option value="Van">Van</option>
-                      <option value="Refrigerated Truck">Refrigerated Truck</option>
-                    </select>
-                  </div>
-                  <div class="col-md-3">
-                    <input type="text" class="form-control" id="tLicensePlate" placeholder="License Plate">
-                  </div>
-                  <div class="col-md-3">
-                    <input type="date" class="form-control" id="tTransportDate">
-                  </div>
-                  <div class="col-md-2">
-                    <input type="text" class="form-control" id="tDuration" placeholder="HH:MM:SS">
-                  </div>
-                  <div class="col-md-1">
-                    <button class="btn btn-primary w-100" onclick="addTransport()">Add</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
           </div>
           <div class="col-md-4">
             <div class="card">
