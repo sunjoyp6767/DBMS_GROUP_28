@@ -74,7 +74,7 @@
     <div class="collapse d-lg-block sidebar" id="sidebarMenu">
       <a href="#" onclick="showSection('grading')">Grading Standards</a>
       <a href="#" onclick="showSection('reports')">Reports</a>
-      <a href="#" onclick="showSection('tracking')">Meat Tracking</a>
+      <a href="trackmeat.html">Meat Tracking</a>
       <a href="#" onclick="showSection('quality')">Quality Analysis</a>
       <a href="#" onclick="showSection('packaging')">Packaging Oversight</a>
       <a href="#" onclick="showSection('transport')">Transport Monitoring</a>
@@ -258,78 +258,78 @@
       </div>
 
       <!-- Quality Analysis Section -->
-<div id="quality" class="section">
-  <h3>Quality Analysis & Problem Identification</h3>
-  <div class="row mb-3">
-    <div class="col-md-12">
-      <input type="text" class="form-control" id="qualitySearch" placeholder="Search by health issue, treatment, or inspection result...">
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-6">
-      <div class="card mb-3">
-        <div class="card-header">
-          <h5>Quality Trends Over Time</h5>
+      <div id="quality" class="section">
+        <h3>Quality Analysis & Problem Identification</h3>
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <input type="text" class="form-control" id="qualitySearch" placeholder="Search by health issue, treatment, or inspection result...">
+          </div>
         </div>
-        <div class="card-body">
-          <div class="chart-container">
-            <canvas id="qualityTrendChart"></canvas>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card mb-3">
+              <div class="card-header">
+                <h5>Quality Trends Over Time</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="qualityTrendChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h5>Health Issues vs Quality</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped" id="healthQualityTable">
+                    <thead>
+                      <tr>
+                        <th>Health Issue</th>
+                        <th>Treatment</th>
+                        <th>Avg Quality</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card mb-3">
+              <div class="card-header">
+                <h5>Facility Performance</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="facilityChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h5>Problem Facilities</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped" id="problemFacilitiesTable">
+                    <thead>
+                      <tr>
+                        <th>Slaughterhouse</th>
+                        <th>Inspection Result</th>
+                        <th>Processing Time</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <h5>Health Issues vs Quality</h5>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped" id="healthQualityTable">
-              <thead>
-                <tr>
-                  <th>Health Issue</th>
-                  <th>Treatment</th>
-                  <th>Avg Quality</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card mb-3">
-        <div class="card-header">
-          <h5>Facility Performance</h5>
-        </div>
-        <div class="card-body">
-          <div class="chart-container">
-            <canvas id="facilityChart"></canvas>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <h5>Problem Facilities</h5>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped" id="problemFacilitiesTable">
-              <thead>
-                <tr>
-                  <th>Slaughterhouse</th>
-                  <th>Inspection Result</th>
-                  <th>Processing Time</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
       <!-- Packaging Oversight Section -->
       <div id="packaging" class="section">
@@ -914,7 +914,7 @@ function loadQualityReports() {
     }
     
     function loadQualityAnalysis() {
-    fetch('php/get_quality_analysis.php')
+  fetch('php/get_quality_analysis.php')
     .then(response => response.json())
     .then(data => {
       // Store the data globally for searching
@@ -929,13 +929,13 @@ function loadQualityReports() {
       // Update charts with real data
       updateQualityCharts(data);
     });
-    }
+}
 
-    function updateHealthQualityTable(data) {
-    const tableBody = document.querySelector('#healthQualityTable tbody');
-    tableBody.innerHTML = '';
+function updateHealthQualityTable(data) {
+  const tableBody = document.querySelector('#healthQualityTable tbody');
+  tableBody.innerHTML = '';
   
-    data.forEach(item => {
+  data.forEach(item => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${item.health_issue || 'N/A'}</td>
@@ -943,14 +943,14 @@ function loadQualityReports() {
       <td>${item.avg_quality ? parseFloat(item.avg_quality).toFixed(2) : 'N/A'}</td>
     `;
     tableBody.appendChild(row);
-    });
-    }
+  });
+}
 
-    function updateProblemFacilitiesTable(data) {
-    const tableBody = document.querySelector('#problemFacilitiesTable tbody');
-    tableBody.innerHTML = '';
+function updateProblemFacilitiesTable(data) {
+  const tableBody = document.querySelector('#problemFacilitiesTable tbody');
+  tableBody.innerHTML = '';
   
-    data.forEach(item => {
+  data.forEach(item => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${item.name}</td>
@@ -958,8 +958,8 @@ function loadQualityReports() {
       <td>${item.processing_time}</td>
     `;
     tableBody.appendChild(row);
-    });
-    }
+  });
+}
     
     function loadPackagingData() {
       fetch('php/get_packaging_data.php')
@@ -1887,6 +1887,28 @@ document.getElementById('transportDateFilter').addEventListener('change', update
 document.getElementById('reportsSearch').addEventListener('input', updateReportUI);
 document.getElementById('reportQualityFilter').addEventListener('change', updateReportUI);
 document.getElementById('reportInspectionFilter').addEventListener('change', updateReportUI);
+
+document.getElementById('qualitySearch').addEventListener('input', function() {
+  const searchTerm = this.value.toLowerCase();
+  
+  if (!window.qualityAnalysisData) return;
+  
+  // Filter health issues
+  const filteredHealth = window.qualityAnalysisData.healthIssues.filter(item => {
+    return (item.health_issue && item.health_issue.toLowerCase().includes(searchTerm)) ||
+           (item.treatment_type && item.treatment_type.toLowerCase().includes(searchTerm));
+  });
+  
+  // Filter facilities
+  const filteredFacilities = window.qualityAnalysisData.problemFacilities.filter(item => {
+    return (item.name && item.name.toLowerCase().includes(searchTerm)) ||
+           (item.health_inspection_report && item.health_inspection_report.toLowerCase().includes(searchTerm));
+  });
+  
+  // Update tables with filtered data
+  updateHealthQualityTable(filteredHealth);
+  updateProblemFacilitiesTable(filteredFacilities);
+});
   </script>
 </body>
 </html>
