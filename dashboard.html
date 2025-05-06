@@ -530,12 +530,19 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Global variables
     let currentSection = 'grading';
     let map;
     let transportMarkers = [];
     let transportData = [];
     let transportConditionsChart;
-
+    
+    // Initialize the page
+    function initializeUser() {
+      const username = localStorage.getItem("username") || "User";
+      document.getElementById("usernameDisplay").textContent = username;
+      showSection(currentSection);
+    }
 
     function loadAllSections() {
       loadGradingStandards();
@@ -545,6 +552,338 @@
       loadPackagingData();
       loadTransportData();
     }
+
+    function showSection(id) {
+  currentSection = id;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  if (id === 'transport') {
+  if (!map) {
+    initLeaflet();
+  }
+  updateTransportMap(transportData); // Only this is needed
+}
+
+  if (id === 'quality') {
+    updateQualityCharts();
+  }
+}
+    
+    function logout() {
+      localStorage.removeItem("username");
+      window.location.href = "index.html";
+    }
+    
+    function initLeaflet() {
+      map = L.map('map').setView([23.8103, 90.4125], 7);  // Center of US
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      
+      // Add some sample markers (in a real app, these would come from your database)
+      
+    }
+
+
+
+
+    function renderTransportTable(data) {
+  const tableBody = document.querySelector('#transportTable tbody');
+  tableBody.innerHTML = '';
+
+  data.forEach(item => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${item.transport_id}</td>
+      <td>${item.vehicle_type}</td>
+      <td>${item.license_plate}</td>
+      <td>${item.transport_date}</td>
+      <td>${item.transportation_duration}</td>
+      <td>${item.temperature !== null ? item.temperature + '°C' : 'N/A'}</td>
+      <td>${item.humidity !== null ? item.humidity + '%' : 'N/A'}</td>
+      <td>
+        <button class="btn btn-sm btn-warning" onclick="editTransport(${item.transport_id})">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteTransport(${item.transport_id})">Delete</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+function loadTransportData() {
+  fetch('php/get_transport_data.php')
+    .then(response => response.json())
+    .then(data => {
+      transportData = data; // ✅ store full data set
+      renderTransportTable(data); // ✅ re-render using helper
+      updateTransportConditionsChart(data);
+      updateTransportMap(data);
+    })
+    .catch(error => {
+      console.error('Error loading transport data:', error);
+    });
+}
+
+
+function updateTransportConditionsChart(data) {
+  const ctx = document.getElementById('transportConditionsChart').getContext('2d');
+
+  // Clear the previous chart if it exists
+  if (transportConditionsChart) {
+    transportConditionsChart.destroy();
+  }
+
+  // Filter valid values only
+  const validTemperatures = data.map(d => parseFloat(d.temperature)).filter(val => !isNaN(val));
+  const validHumidities = data.map(d => parseFloat(d.humidity)).filter(val => !isNaN(val));
+
+  const avgTemp = validTemperatures.length > 0
+    ? validTemperatures.reduce((sum, val) => sum + val, 0) / validTemperatures.length
+    : 0;
+
+  const avgHumidity = validHumidities.length > 0
+    ? validHumidities.reduce((sum, val) => sum + val, 0) / validHumidities.length
+    : 0;
+
+  // Initialize chart
+  transportConditionsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Temperature (°C)', 'Humidity (%)'],
+      datasets: [{
+        label: 'Average Conditions',
+        data: [avgTemp, avgHumidity],
+        backgroundColor: ['#FF6384', '#36A2EB']
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        legend: {
+          display: true
+        }
+      }
+    }
+  });
+}
+
+function loadSensorMarkers() {
+  console.log("Loading sensor data...");
+  fetch('php/get_sensor_data.php')
+    .then(response => response.json())
+    .then(data => {
+      console.log("Sensor Data:", data);
+      // Remove previous markers
+      transportMarkers.forEach(m => map.removeLayer(m));
+      transportMarkers = [];
+
+      data.forEach(item => {
+        if (!item.latitude || !item.longitude) return;
+
+        const marker = L.marker([item.latitude, item.longitude])
+          .addTo(map)
+          .bindPopup(`
+            <b>Vehicle: ${item.vehicle_type}</b><br>
+            Plate: ${item.license_plate}<br>
+            Temp: ${item.temperature ?? 'N/A'}°C<br>
+            Humidity: ${item.humidity ?? 'N/A'}%<br>
+            Time: ${item.timestamp}
+          `);
+
+        transportMarkers.push(marker);
+      });
+
+      if (transportMarkers.length > 0) {
+        const group = L.featureGroup(transportMarkers);
+        map.fitBounds(group.getBounds(), { padding: [30, 30] });
+      }
+    })
+    .catch(error => console.error('Error loading sensor data:', error));
+}
+
+function updateTransportUI() {
+  const searchValue = document.getElementById('transportSearch').value.toLowerCase();
+  const vehicleFilter = document.getElementById('transportVehicleFilter').value;
+  const dateFilter = document.getElementById('transportDateFilter').value;
+
+  const filteredData = transportData.filter(item => {
+    const matchesSearch = item.license_plate.toLowerCase().includes(searchValue);
+    const matchesVehicle = !vehicleFilter || item.vehicle_type === vehicleFilter;
+    const matchesDate = !dateFilter || item.transport_date === dateFilter;
+    return matchesSearch && matchesVehicle && matchesDate;
+  });
+
+  renderTransportTable(filteredData);
+  updateTransportConditionsChart(filteredData);
+}
+function addTransport() {
+      const vehicleType = document.getElementById('tVehicleType').value;
+      const licensePlate = document.getElementById('tLicensePlate').value;
+      const transportDate = document.getElementById('tTransportDate').value;
+      const duration = document.getElementById('tDuration').value;
+      
+      if (!vehicleType || !licensePlate || !transportDate || !duration) {
+        alert('Please fill all fields');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('vehicle_type', vehicleType);
+      formData.append('license_plate', licensePlate);
+      formData.append('transport_date', transportDate);
+      formData.append('transportation_duration', duration);
+      
+      fetch('php/add_transport.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Transport added successfully');
+          loadTransportData();
+          // Clear form
+          document.getElementById('tLicensePlate').value = '';
+          document.getElementById('tDuration').value = '';
+        } else {
+          alert('Error: ' + data.message);
+        }
+      });
+    }
+
+    function editTransport(id) {
+  const row = [...document.querySelectorAll('#transportTable tbody tr')].find(r => r.cells[0].textContent == id);
+  if (!row) return alert('Transport not found.');
+
+  document.getElementById('editTransportId').value = id;
+  document.getElementById('editVehicleType').value = row.cells[1].textContent;
+  document.getElementById('editLicensePlate').value = row.cells[2].textContent;
+  document.getElementById('editTransportDate').value = row.cells[3].textContent;
+  document.getElementById('editDuration').value = row.cells[4].textContent;
+
+  new bootstrap.Modal(document.getElementById('editTransportModal')).show();
+}
+
+document.getElementById('editTransportForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const id = document.getElementById('editTransportId').value;
+
+  const formData = new FormData();
+  formData.append('transport_id', id);
+  formData.append('vehicle_type', document.getElementById('editVehicleType').value);
+  formData.append('license_plate', document.getElementById('editLicensePlate').value);
+  formData.append('transport_date', document.getElementById('editTransportDate').value);
+  formData.append('transportation_duration', document.getElementById('editDuration').value);
+
+  fetch('php/update_transport.php', {
+    method: 'POST',
+    body: formData
+  }).then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        alert('Transport updated successfully');
+        bootstrap.Modal.getInstance(document.getElementById('editTransportModal')).hide();
+        loadTransportData();
+      } else {
+        alert('Error: ' + res.message);
+      }
+    });
+});
+    
+    function deleteTransport(id) {
+      if (confirm('Are you sure you want to delete this transport record?')) {
+        fetch('php/delete_transport.php?id=' + id)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              loadTransportData();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          });
+      }
+    }
+
+function updateTransportMap() {
+  fetch('php/get_sensor_data.php')
+    .then(response => response.json())
+    .then(data => {
+      // Remove old markers and routes
+      transportMarkers.forEach(marker => map.removeLayer(marker));
+      transportMarkers = [];
+
+      // Clear previous routing controls (if any)
+      if (map._routingControl) {
+        map.removeControl(map._routingControl);
+        map._routingControl = null;
+      }
+
+      data.forEach(item => {
+        const liveLat = parseFloat(item.latitude);
+        const liveLng = parseFloat(item.longitude);
+        const destLat = parseFloat(item.dest_lat);
+        const destLng = parseFloat(item.dest_lng);
+
+        if (isNaN(liveLat) || isNaN(liveLng) || isNaN(destLat) || isNaN(destLng)) return;
+
+        const liveCoords = [liveLat, liveLng];
+        const destCoords = [destLat, destLng];
+
+        // Marker for live sensor location
+        const liveMarker = L.marker(liveCoords, {
+          icon: L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+            iconSize: [30, 45],
+            iconAnchor: [15, 45]
+          })
+        }).bindPopup(`
+          <b>${item.vehicle_type}</b><br>${item.license_plate}<br>
+          <b>Sensor</b><br>Temp: ${item.temperature} °C<br>Humidity: ${item.humidity}%
+        `);
+        liveMarker.addTo(map);
+        transportMarkers.push(liveMarker);
+
+        // Marker for destination
+        const destMarker = L.circleMarker(destCoords, {
+          color: 'red',
+          radius: 6
+        }).bindPopup(`<b>Destination:</b> ${item.destination}`);
+        destMarker.addTo(map);
+        transportMarkers.push(destMarker);
+
+        // Route
+        const control = L.Routing.control({
+          waypoints: [L.latLng(liveCoords), L.latLng(destCoords)],
+          addWaypoints: false,
+          draggableWaypoints: false,
+          routeWhileDragging: false,
+          fitSelectedRoutes: false,
+          show: false,
+          createMarker: () => null
+        }).addTo(map);
+
+        // Store the last routing control to be removed later
+        map._routingControl = control;
+      });
+
+      // Fit map to bounds of all markers
+      if (transportMarkers.length > 0) {
+        const group = L.featureGroup(transportMarkers);
+        map.fitBounds(group.getBounds(), { padding: [30, 30] });
+      }
+    })
+    .catch(error => {
+      console.error('Error loading transport map:', error);
+    });
+}
+
 
 
     function initializeUser() {
@@ -726,14 +1065,15 @@ function deletePackage(id) {
   .then(data => {
     if (data.success) {
       alert('Package deleted successfully');
-      loadPackagingData();
+      console.log(`Deleted Package_ID: ${id}`);
+      loadPackagingData(); // Refresh table
     } else {
       alert('Error: ' + data.message);
       console.error('Server error:', data.message);
     }
   })
   .catch(error => {
-    console.error('Request failed:', error);
+    console.error('Delete request failed:', error);
     alert('An error occurred while deleting the package.');
   });
 }
@@ -883,6 +1223,19 @@ document.addEventListener("DOMContentLoaded", function () {
   // Rest of your existing code...
 });
 
+
+//Transpoart_Monitoring
+ 
+
+
+  
+
+  document.getElementById('transportSearch').addEventListener('input', function () {
+  updateTransportUI();
+});
+
+document.getElementById('transportVehicleFilter').addEventListener('change', updateTransportUI);
+document.getElementById('transportDateFilter').addEventListener('change', updateTransportUI);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
