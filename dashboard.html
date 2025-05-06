@@ -8,18 +8,12 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
   <style>
     body {
       min-height: 100vh;
       overflow-x: hidden;
-    }
-    .section {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-    }
-    .chart-container {
-      height: 300px;
     }
     .sidebar {
       background-color: #343a40;
@@ -46,12 +40,26 @@
       height: 300px;
       width: 100%;
     }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+    .leaflet-routing-container {
+    display: none !important;
+  }
   </style>
 </head>
-<body onload="initializeUser()">
+<body onload="initializeUser(); loadAllSections();">
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">TrackGradeMeat</a>
+      <a class="navbar-brand" href="#">TrackNGrade</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -65,17 +73,15 @@
     </div>
   </nav>
 
-
   <div class="d-flex">
     <div class="collapse d-lg-block sidebar" id="sidebarMenu">
       <a href="#" onclick="showSection('grading')">Grading Standards</a>
       <a href="#" onclick="showSection('reports')">Reports</a>
-      <a href="trackmeat.html">Meat Tracking</a>
+      <a href="#" onclick="showSection('tracking')">Meat Tracking</a>
       <a href="#" onclick="showSection('quality')">Quality Analysis</a>
       <a href="#" onclick="showSection('packaging')">Packaging Oversight</a>
       <a href="#" onclick="showSection('transport')">Transport Monitoring</a>
     </div>
-
 
     <div class="container-fluid p-4">
       <!-- Grading Standards Section -->
@@ -529,59 +535,7 @@
 
   <!-- Edit Modals -->
   <div class="modal fade" id="editGradingModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form id="editGradingForm">
-          <div class="modal-header">
-            <h5 class="modal-title">Edit Grading Standard</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <input type="hidden" id="editGradeId">
-            <div class="mb-3">
-              <label>Product Type</label>
-              <select class="form-select" id="editProductType" disabled>
-                <option value="Mock tender">Mock tender</option>
-                <option value="Chip Steak">Chip Steak</option>
-                <option value="T-bone steak">T-bone steak</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label>Description</label>
-              <input type="text" class="form-control" id="editDescription" required>
-            </div>
-            <div class="mb-3">
-              <label>Quality Score</label>
-              <select class="form-select" id="editQualityScore" required>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label>Average Weight</label>
-              <input type="number" class="form-control" id="editAvgWeight" step="0.01" required>
-            </div>
-            <div class="mb-3">
-              <label>Texture</label>
-              <input type="text" class="form-control" id="editTexture" required>
-            </div>
-            <div class="mb-3">
-              <label>Grading Date</label>
-              <input type="date" class="form-control" id="editGradingDate" required>
-            </div>
-            <div class="mb-3">
-              <label>Batch Quantity</label>
-              <input type="number" class="form-control" id="editQuantity" required>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-success">Save Changes</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <!-- Modal content for editing grading standards -->
   </div>
   
   <div class="modal fade" id="editPackageModal" tabindex="-1" aria-hidden="true">
@@ -669,30 +623,6 @@
     </div>
   </div>
 
-  <!-- Modal for Viewing Report Details -->
-<div class="modal fade" id="reportDetailsModal" tabindex="-1" aria-labelledby="reportDetailsModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="reportDetailsModalLabel">Report Details</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p><strong>Product Type:</strong> <span id="detailProductType"></span></p>
-        <p><strong>Grade Description:</strong> <span id="detailGradeDescription"></span></p>
-        <p><strong>Quality Score:</strong> <span id="detailQualityScore"></span></p>
-        <p><strong>Final Weight:</strong> <span id="detailFinalWeight"></span></p>
-        <p><strong>Slaughterhouse:</strong> <span id="detailSlaughterhouse"></span></p>
-        <p><strong>Inspection:</strong> <span id="detailInspection"></span></p>
-        <p><strong>Processing Time:</strong> <span id="detailProcessingTime"></span></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // Global variables
@@ -708,7 +638,7 @@
       document.getElementById("usernameDisplay").textContent = username;
       showSection(currentSection);
     }
-
+    
     function loadAllSections() {
       loadGradingStandards();
       loadQualityReports();
@@ -717,7 +647,7 @@
       loadPackagingData();
       loadTransportData();
     }
-
+    
     function showSection(id) {
   currentSection = id;
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -750,11 +680,210 @@
       // Add some sample markers (in a real app, these would come from your database)
       
     }
+    
+  
+    
+    // Section-specific functions
+    function loadGradingStandards() {
+  fetch('php/get_grading_standards.php')
+    .then(response => response.json())
+    .then(data => {
+      const tableBody = document.querySelector('#gradingTable tbody');
+      tableBody.innerHTML = '';
+      
+      data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.product_name || 'N/A'}</td>
+          <td>${item.description || 'N/A'}</td>
+          <td>${item.quality_score || 'N/A'}</td>
+          <td>${item.average_weight || 'N/A'}</td>
+          <td>${item.texture_quality || 'N/A'}</td>
+          <td>${item.date_of_grading || 'N/A'}</td>
+          <td>${item.quantity || 'N/A'}</td>
+          <td>
+            <button class="btn btn-sm btn-warning" onclick="editGradingStandard(${item.grade_id})">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteGradingStandard(${item.grade_id})">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+          });
+          
+          // Populate product type dropdown
+          const productTypeSelect = document.getElementById('gradeProductType');
+          productTypeSelect.innerHTML = '<option value="">Select Product Type</option>';
+          const uniqueTypes = [...new Set(data.map(item => item.product_name))];
+          uniqueTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type;
+            productTypeSelect.appendChild(option);
+          });
+        });
+    }
+    
+    function loadQualityReports() {
+      fetch('php/get_quality_reports.php')
+        .then(response => response.json())
+        .then(data => {
+          const tableBody = document.querySelector('#reportsTable tbody');
+          tableBody.innerHTML = '';
+          
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.product_name}</td>
+              <td>${item.description}</td>
+              <td>${item.quality_score}</td>
+              <td>${item.final_weight || 'N/A'}</td>
+              <td>${item.slaughterhouse_name || 'N/A'}</td>
+              <td>${item.health_inspection_report || 'N/A'}</td>
+              <td>${item.processing_time || 'N/A'}</td>
+              <td>
+                <button class="btn btn-sm btn-info" onclick="viewReportDetails(${item.grade_id})">Details</button>
+              </td>
+            `;
+            tableBody.appendChild(row);
+          });
+          
+          updateReportCharts(data);
+        });
+    }
+    
+    function loadMeatTracking() {
+  fetch('php/get_meat_tracking.php')
+    .then(response => response.json())
+    .then(data => {
+      const tableBody = document.querySelector('#trackingTable tbody');
+      tableBody.innerHTML = '';
+      
+      data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.batch_id || 'N/A'}</td>
+          <td>${item.date_processed || 'N/A'}</td>
+          <td>${item.processed_batch_id || 'N/A'}</td>
+          <td>${item.quality || 'N/A'}</td>
+          <td>${item.package_id || 'N/A'}</td>
+          <td>${item.package_type || 'N/A'}</td>
+          <td>${item.weight ? item.weight + ' kg' : 'N/A'}</td>
+          <td>${item.date_packaged || 'N/A'}</td>
+          <td>${item.transport_id || 'N/A'}</td>
+          <td>${item.vehicle_type || 'N/A'}</td>
+          <td>${item.transport_date || 'N/A'}</td>
+          <td>
+            <button class="btn btn-sm btn-info" onclick="viewTrackingDetails(${item.batch_id})">Track</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+      
+      updateTrackingTimeline(data);
+    })
+    .catch(error => {
+      console.error('Error loading meat tracking data:', error);
+    });
+    }
+    
+    function loadQualityAnalysis() {
+      fetch('php/get_quality_analysis.php')
+        .then(response => response.json())
+        .then(data => {
+          // Update health vs quality table
+          const healthTableBody = document.querySelector('#healthQualityTable tbody');
+          healthTableBody.innerHTML = '';
+          
+          data.healthIssues.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.health_issue || 'N/A'}</td>
+              <td>${item.treatment_type || 'N/A'}</td>
+              <td>${item.avg_quality || 'N/A'}</td>
+            `;
+            healthTableBody.appendChild(row);
+          });
+          
+          // Update problem facilities table
+          const facilitiesTableBody = document.querySelector('#problemFacilitiesTable tbody');
+          facilitiesTableBody.innerHTML = '';
+          
+          data.problemFacilities.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.name}</td>
+              <td>${item.health_inspection_report}</td>
+              <td>${item.processing_time}</td>
+            `;
+            facilitiesTableBody.appendChild(row);
+          });
+          
+          updateQualityCharts(data);
+        });
+    }
+    
+    function loadPackagingData() {
+      fetch('php/get_packaging_data.php')
+        .then(response => response.json())
+        .then(data => {
+          const tableBody = document.querySelector('#packagingTable tbody');
+          tableBody.innerHTML = '';
+          
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.package_id}</td>
+              <td>${item.batch_id || 'N/A'}</td>
+              <td>${item.product_name || 'N/A'}</td>
+              <td>${item.package_type}</td>
+              <td>${item.weight}</td>
+              <td>${item.date_packaged}</td>
+              <td>${item.zip}</td>
+              <td>${item.quality || 'N/A'}</td>
+              <td>
+                <button class="btn btn-sm btn-warning" onclick="editPackage(${item.package_id})">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deletePackage(${item.package_id})">Delete</button>
+              </td>
+            `;
+            tableBody.appendChild(row);
+          });
+          
+          // Populate batch dropdown
+          const batchSelect = document.getElementById('pkgBatchId');
+          batchSelect.innerHTML = '<option value="">Select Batch</option>';
+          const uniqueBatches = [...new Set(data.map(item => item.batch_id))].filter(id => id);
+          uniqueBatches.forEach(id => {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = `Batch ${id}`;
+            batchSelect.appendChild(option);
+          });
+          
+          updatePackagingChart(data);
+        });
+    }
 
+    function filterPackagingTable() {
+  const search = document.getElementById('packagingSearch').value.toLowerCase();
+  const type = document.getElementById('packagingTypeFilter').value;
+  const minWeight = parseFloat(document.getElementById('packagingWeightFrom').value) || 0;
+  const maxWeight = parseFloat(document.getElementById('packagingWeightTo').value) || Infinity;
 
+  const rows = document.querySelectorAll('#packagingTable tbody tr');
 
+  rows.forEach(row => {
+    const rowText = row.textContent.toLowerCase();
+    const rowType = row.cells[3].textContent;
+    const weight = parseFloat(row.cells[4].textContent) || 0;
 
-    function renderTransportTable(data) {
+    const matchText = !search || rowText.includes(search);
+    const matchType = !type || rowType === type;
+    const matchWeight = weight >= minWeight && weight <= maxWeight;
+
+    row.style.display = (matchText && matchType && matchWeight) ? '' : 'none';
+  });
+}
+    
+function renderTransportTable(data) {
   const tableBody = document.querySelector('#transportTable tbody');
   tableBody.innerHTML = '';
 
@@ -777,6 +906,7 @@
   });
 }
 
+
 function loadTransportData() {
   fetch('php/get_transport_data.php')
     .then(response => response.json())
@@ -791,7 +921,266 @@ function loadTransportData() {
     });
 }
 
+    
+    // Chart update functions
+    function updateReportCharts(data) {
+      // Quality distribution chart
+      const qualityCtx = document.getElementById('qualityChart').getContext('2d');
+      const qualityCounts = {
+        High: data.filter(item => item.quality_score === 'High').length,
+        Medium: data.filter(item => item.quality_score === 'Medium').length,
+        Low: data.filter(item => item.quality_score === 'Low').length
+      };
+      
+      new Chart(qualityCtx, {
+        type: 'pie',
+        data: {
+          labels: ['High', 'Medium', 'Low'],
+          datasets: [{
+            data: [qualityCounts.High, qualityCounts.Medium, qualityCounts.Low],
+            backgroundColor: ['#4CAF50', '#FFC107', '#F44336']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+      
+      // Inspection results chart
+      const inspectionCtx = document.getElementById('inspectionChart').getContext('2d');
+      const inspectionCounts = {
+        Passed: data.filter(item => item.health_inspection_report === 'Passed').length,
+        Failed: data.filter(item => item.health_inspection_report === 'Failed').length,
+        Unknown: data.filter(item => !item.health_inspection_report).length
+      };
+      
+      new Chart(inspectionCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Passed', 'Failed', 'Unknown'],
+          datasets: [{
+            label: 'Inspection Results',
+            data: [inspectionCounts.Passed, inspectionCounts.Failed, inspectionCounts.Unknown],
+            backgroundColor: ['#4CAF50', '#F44336', '#9E9E9E']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+    
+    function updateTrackingTimeline(data) {
+  const timeline = document.getElementById('supplyTimeline');
+  timeline.innerHTML = '';
+  
+  // Group data by batch for timeline
+  const batches = {};
+  data.forEach(item => {
+    if (!batches[item.batch_id]) {
+      batches[item.batch_id] = {
+        product: item.product_type,
+        events: []
+      };
+    }
+    
+    if (item.date_processed) {
+      batches[item.batch_id].events.push({
+        date: item.date_processed,
+        event: 'Batch Processed',
+        details: `Batch ${item.batch_id}`
+      });
+    }
+    
+    if (item.date_packaged) {
+      batches[item.batch_id].events.push({
+        date: item.date_packaged,
+        event: 'Packaged',
+        details: `Package ${item.package_id || ''}`
+      });
+    }
+    
+    if (item.transport_date) {
+      batches[item.batch_id].events.push({
+        date: item.transport_date,
+        event: 'Shipped',
+        details: `Transport ${item.transport_id || ''}`
+      });
+    }
+  });
+  
+  // Display timeline for the first batch (or selected batch)
+  const batchId = Object.keys(batches)[0];
+  if (batchId && batches[batchId].events.length > 0) {
+    // Sort events by date
+    batches[batchId].events.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    // Create timeline elements
+    batches[batchId].events.forEach(event => {
+      const eventElement = document.createElement('div');
+      eventElement.className = 'timeline-event';
+      eventElement.innerHTML = `
+        <div class="timeline-date">${event.date}</div>
+        <div class="timeline-content">
+          <h6>${event.event}</h6>
+          <p>${event.details}</p>
+        </div>
+      `;
+      timeline.appendChild(eventElement);
+    });
+  }
+    }
+    
+    function updateQualityCharts(data) {
+      // Quality trends chart
+      const trendCtx = document.getElementById('qualityTrendChart').getContext('2d');
+      
+      // Sample data - in a real app, this would come from your database
+      const trendData = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [
+          {
+            label: 'High Quality',
+            data: [12, 19, 15, 17, 20, 18],
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+            fill: true
+          },
+          {
+            label: 'Medium Quality',
+            data: [8, 7, 10, 9, 6, 8],
+            borderColor: '#FFC107',
+            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+            fill: true
+          },
+          {
+            label: 'Low Quality',
+            data: [3, 2, 4, 1, 2, 3],
+            borderColor: '#F44336',
+            backgroundColor: 'rgba(244, 67, 54, 0.1)',
+            fill: true
+          }
+        ]
+      };
+      
+      new Chart(trendCtx, {
+        type: 'line',
+        data: trendData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+      
+      // Facility performance chart
+      const facilityCtx = document.getElementById('facilityChart').getContext('2d');
+      
+      // Sample data
+      const facilityData = {
+        labels: ['Central SH', 'Westside', 'East End'],
+        datasets: [{
+          label: 'Processing Time (hours)',
+          data: [8, 9, 10],
+          backgroundColor: ['#2196F3', '#2196F3', '#F44336']
+        }]
+      };
+      
+      new Chart(facilityCtx, {
+        type: 'bar',
+        data: facilityData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+    
+    function updatePackagingChart(data) {
+  // ----- 1. Packaging by Type -----
+  const typeCounts = { 'Vacuum Sealed': 0, 'Frozen': 0, 'Chilled': 0 };
 
+  data.forEach(item => {
+    const type = item.package_type;
+    if (typeCounts[type] !== undefined) {
+      typeCounts[type]++;
+    }
+  });
+
+  const typeCtx = document.getElementById('packagingTypeChart').getContext('2d');
+
+  new Chart(typeCtx, {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(typeCounts),
+      datasets: [{
+        data: Object.values(typeCounts),
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+
+  // ----- 2. Monthly Packaging Volume -----
+  const monthCounts = {
+    Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0,
+    Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0
+  };
+
+  data.forEach(item => {
+    if (item.date_packaged) {
+      const date = new Date(item.date_packaged);
+      const month = date.toLocaleString('default', { month: 'short' }); // e.g., "Apr"
+      if (monthCounts[month] !== undefined) {
+        monthCounts[month]++;
+      }
+    }
+  });
+
+  const volumeCtx = document.getElementById('packagingVolumeChart').getContext('2d');
+
+  new Chart(volumeCtx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(monthCounts),
+      datasets: [{
+        label: 'Packages',
+        data: Object.values(monthCounts),
+        backgroundColor: '#4CAF50'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+    
 function updateTransportConditionsChart(data) {
   const ctx = document.getElementById('transportConditionsChart').getContext('2d');
 
@@ -873,108 +1262,6 @@ function loadSensorMarkers() {
     .catch(error => console.error('Error loading sensor data:', error));
 }
 
-function updateTransportUI() {
-  const searchValue = document.getElementById('transportSearch').value.toLowerCase();
-  const vehicleFilter = document.getElementById('transportVehicleFilter').value;
-  const dateFilter = document.getElementById('transportDateFilter').value;
-
-  const filteredData = transportData.filter(item => {
-    const matchesSearch = item.license_plate.toLowerCase().includes(searchValue);
-    const matchesVehicle = !vehicleFilter || item.vehicle_type === vehicleFilter;
-    const matchesDate = !dateFilter || item.transport_date === dateFilter;
-    return matchesSearch && matchesVehicle && matchesDate;
-  });
-
-  renderTransportTable(filteredData);
-  updateTransportConditionsChart(filteredData);
-}
-function addTransport() {
-      const vehicleType = document.getElementById('tVehicleType').value;
-      const licensePlate = document.getElementById('tLicensePlate').value;
-      const transportDate = document.getElementById('tTransportDate').value;
-      const duration = document.getElementById('tDuration').value;
-      
-      if (!vehicleType || !licensePlate || !transportDate || !duration) {
-        alert('Please fill all fields');
-        return;
-      }
-      
-      const formData = new FormData();
-      formData.append('vehicle_type', vehicleType);
-      formData.append('license_plate', licensePlate);
-      formData.append('transport_date', transportDate);
-      formData.append('transportation_duration', duration);
-      
-      fetch('php/add_transport.php', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Transport added successfully');
-          loadTransportData();
-          // Clear form
-          document.getElementById('tLicensePlate').value = '';
-          document.getElementById('tDuration').value = '';
-        } else {
-          alert('Error: ' + data.message);
-        }
-      });
-    }
-
-    function editTransport(id) {
-  const row = [...document.querySelectorAll('#transportTable tbody tr')].find(r => r.cells[0].textContent == id);
-  if (!row) return alert('Transport not found.');
-
-  document.getElementById('editTransportId').value = id;
-  document.getElementById('editVehicleType').value = row.cells[1].textContent;
-  document.getElementById('editLicensePlate').value = row.cells[2].textContent;
-  document.getElementById('editTransportDate').value = row.cells[3].textContent;
-  document.getElementById('editDuration').value = row.cells[4].textContent;
-
-  new bootstrap.Modal(document.getElementById('editTransportModal')).show();
-}
-
-document.getElementById('editTransportForm').addEventListener('submit', function (e) {
-  e.preventDefault();
-  const id = document.getElementById('editTransportId').value;
-
-  const formData = new FormData();
-  formData.append('transport_id', id);
-  formData.append('vehicle_type', document.getElementById('editVehicleType').value);
-  formData.append('license_plate', document.getElementById('editLicensePlate').value);
-  formData.append('transport_date', document.getElementById('editTransportDate').value);
-  formData.append('transportation_duration', document.getElementById('editDuration').value);
-
-  fetch('php/update_transport.php', {
-    method: 'POST',
-    body: formData
-  }).then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        alert('Transport updated successfully');
-        bootstrap.Modal.getInstance(document.getElementById('editTransportModal')).hide();
-        loadTransportData();
-      } else {
-        alert('Error: ' + res.message);
-      }
-    });
-});
-    
-    function deleteTransport(id) {
-      if (confirm('Are you sure you want to delete this transport record?')) {
-        fetch('php/delete_transport.php?id=' + id)
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              loadTransportData();
-            } else {
-              alert('Error: ' + data.message);
-            }
-          });
-      }
-    }
 
 function updateTransportMap() {
   fetch('php/get_sensor_data.php')
@@ -1051,261 +1338,148 @@ function updateTransportMap() {
 
 
 
-    function initializeUser() {
-      const username = localStorage.getItem("username") || "User";
-      document.getElementById("usernameDisplay").textContent = username;
-      showSection(currentSection);
-    }
-    function logout() {
-      localStorage.removeItem("username");
-      window.location.href = "index.html";
-    }
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(s => s.classList.add('d-none'));
-      document.getElementById(id).classList.remove('d-none');
-      if (id === 'transport') initLeaflet();
-    }
-    function initLeaflet() {
-      const map = L.map('map').setView([23.8103, 90.4125], 6);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
-    }
 
-  function filterPackagingTable() {
-  const search = document.getElementById('packagingSearch').value.toLowerCase();
-  const type = document.getElementById('packagingTypeFilter').value;
-  const minWeight = parseFloat(document.getElementById('packagingWeightFrom').value) || 0;
-  const maxWeight = parseFloat(document.getElementById('packagingWeightTo').value) || Infinity;
+    
+function updateTransportUI() {
+  const searchValue = document.getElementById('transportSearch').value.toLowerCase();
+  const vehicleFilter = document.getElementById('transportVehicleFilter').value;
+  const dateFilter = document.getElementById('transportDateFilter').value;
 
-  const rows = document.querySelectorAll('#packagingTable tbody tr');
-
-  rows.forEach(row => {
-    const rowText = row.textContent.toLowerCase();
-    const rowType = row.cells[3].textContent;
-    const weight = parseFloat(row.cells[4].textContent) || 0;
-
-    const matchText = !search || rowText.includes(search);
-    const matchType = !type || rowType === type;
-    const matchWeight = weight >= minWeight && weight <= maxWeight;
-
-    row.style.display = (matchText && matchType && matchWeight) ? '' : 'none';
+  const filteredData = transportData.filter(item => {
+    const matchesSearch = item.license_plate.toLowerCase().includes(searchValue);
+    const matchesVehicle = !vehicleFilter || item.vehicle_type === vehicleFilter;
+    const matchesDate = !dateFilter || item.transport_date === dateFilter;
+    return matchesSearch && matchesVehicle && matchesDate;
   });
+
+  renderTransportTable(filteredData);
+  updateTransportConditionsChart(filteredData);
 }
-
-
-function updateCharts() {
-  const typeCounts = { 'Vacuum Sealed': 0, 'Frozen': 0, 'Chilled': 0 };
-  const monthCounts = {
-    Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0,
-    Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0
-  };
-
-  const tableRows = document.querySelectorAll('#packagingTable tbody tr');
-
-  tableRows.forEach(row => {
-    const type = row.children[3].textContent;
-    const date = new Date(row.children[5].textContent);
-    const month = date.toLocaleString('default', { month: 'short' });
-
-    if (typeCounts[type] !== undefined) typeCounts[type]++;
-    if (monthCounts[month] !== undefined) monthCounts[month]++;
-  });
-
-  new Chart(document.getElementById('packagingTypeChart'), {
-    type: 'doughnut',
-    data: {
-      labels: Object.keys(typeCounts),
-      datasets: [{ data: Object.values(typeCounts), backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'] }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-  });
-
-  new Chart(document.getElementById('packagingVolumeChart'), {
-    type: 'bar',
-    data: {
-      labels: Object.keys(monthCounts),
-      datasets: [{
-        label: 'Packages',
-        data: Object.values(monthCounts),
-        backgroundColor: '#4CAF50'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: { y: { beginAtZero: true } }
-    }
-  });
-}
-
-  function loadPackagingData() {
-    fetch('php/get_packaging_data.php')
-    .then(response => response.json())
-    .then(data => {
-      const tableBody = document.querySelector('#packagingTable tbody');
-      tableBody.innerHTML = '';
-
-      data.forEach(item => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${item.package_id}</td>
-          <td>${item.batch_id || 'N/A'}</td>
-          <td>${item.product_name || 'N/A'}</td>
-          <td>${item.package_type}</td>
-          <td>${item.weight}</td>
-          <td>${item.date_packaged}</td>
-          <td>${item.zip}</td>
-          <td>${item.quality || 'N/A'}</td>
-          <td>
-            <button class="btn btn-sm btn-warning" onclick="editPackage(${item.package_id})">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deletePackage(${item.package_id})">Delete</button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-
-      // Populate batch dropdown
-      const batchSelect = document.getElementById('pkgBatchId');
-      batchSelect.innerHTML = '<option value="">Select Batch</option>';
-      const uniqueBatches = [...new Set(data.map(item => item.batch_id))].filter(id => id);
-      uniqueBatches.forEach(id => {
-        const option = document.createElement('option');
-        option.value = id;
-        option.textContent = `Batch ${id}`;
-        batchSelect.appendChild(option);
-      });
-
-      updatePackagingChart(data);
-    });
-}
-function addPackaging() {
-  const batchId = document.getElementById('pkgBatchId').value;
-  const pkgType = document.getElementById('pkgType').value;
-  const weight = document.getElementById('pkgWeight').value;
-  const date = document.getElementById('pkgDate').value;
-  const zip = document.getElementById('pkgZip').value;
-
-  if (!batchId || !pkgType || !weight || !date || !zip) {
-    alert('Please fill all fields');
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append('batch_id', batchId);
-  formData.append('package_type', pkgType);
-  formData.append('weight', weight);
-  formData.append('date_packaged', date);
-  formData.append('zip', zip);
-
-  fetch('php/add_package.php', {
-    method: 'POST',
-    body: formData
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Package added successfully');
-        loadPackagingData();
-        document.getElementById('pkgWeight').value = '';
-        document.getElementById('pkgZip').value = '';
-      } else {
-        alert('Error: ' + data.message);
+    
+    // CRUD operations
+    function addGradingStandard() {
+      const productType = document.getElementById('gradeProductType').value;
+      const description = document.getElementById('gradeDescription').value;
+      const qualityScore = document.getElementById('gradeQualityScore').value;
+      const avgWeight = document.getElementById('gradeAvgWeight').value;
+      const texture = document.getElementById('gradeTexture').value;
+      const date = document.getElementById('gradeDate').value;
+      
+      if (!productType || !description || !qualityScore || !avgWeight || !texture || !date) {
+        alert('Please fill all fields');
+        return;
       }
-    });
+      
+      const formData = new FormData();
+      formData.append('product_type', productType);
+      formData.append('description', description);
+      formData.append('quality_score', qualityScore);
+      formData.append('average_weight', avgWeight);
+      formData.append('texture_quality', texture);
+      formData.append('date_of_grading', date);
+      
+      fetch('php/add_grading_standard.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Grading standard added successfully');
+          loadGradingStandards();
+          // Clear form
+          document.getElementById('gradeDescription').value = '';
+          document.getElementById('gradeAvgWeight').value = '';
+          document.getElementById('gradeTexture').value = '';
+        } else {
+          alert('Error: ' + data.message);
+        }
+      });
+    }
+    
+    function editGradingStandard(id) {
+      // In a real app, this would fetch the existing data and populate a modal form
+      alert('Edit functionality for grading standard ' + id + ' would be implemented here');
+    }
+    
+    function deleteGradingStandard(id) {
+      if (confirm('Are you sure you want to delete this grading standard?')) {
+        fetch('php/delete_grading_standard.php?id=' + id)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              loadGradingStandards();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          });
+      }
+    }
+    
+    function addPackaging() {
+      const batchId = document.getElementById('pkgBatchId').value;
+      const pkgType = document.getElementById('pkgType').value;
+      const weight = document.getElementById('pkgWeight').value;
+      const date = document.getElementById('pkgDate').value;
+      const zip = document.getElementById('pkgZip').value;
+      
+      if (!batchId || !pkgType || !weight || !date || !zip) {
+        alert('Please fill all fields');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('batch_id', batchId);
+      formData.append('package_type', pkgType);
+      formData.append('weight', weight);
+      formData.append('date_packaged', date);
+      formData.append('zip', zip);
+      
+      fetch('php/add_package.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Package added successfully');
+          loadPackagingData();
+          // Clear form
+          document.getElementById('pkgWeight').value = '';
+          document.getElementById('pkgZip').value = '';
+        } else {
+          alert('Error: ' + data.message);
+        }
+      });
+    }
+    
+    function editPackage(id) {
+  const row = [...document.querySelectorAll('#packagingTable tbody tr')].find(r => r.cells[0].textContent == id);
+  if (!row) return alert('Package not found.');
+
+  document.getElementById('editPkgId').value = id;
+  document.getElementById('editPkgType').value = row.cells[3].textContent;
+  document.getElementById('editPkgWeight').value = row.cells[4].textContent;
+  document.getElementById('editPkgDate').value = row.cells[5].textContent;
+  document.getElementById('editPkgZip').value = row.cells[6].textContent;
+
+  new bootstrap.Modal(document.getElementById('editPackageModal')).show();
 }
 
-function deletePackage(id) {
-  if (!confirm('Are you sure you want to delete this package?')) return;
+document.getElementById('editPackageForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const id = document.getElementById('editPkgId').value;
+  const data = new FormData();
+  data.append('package_id', id);
+  data.append('package_type', document.getElementById('editPkgType').value);
+  data.append('weight', document.getElementById('editPkgWeight').value);
+  data.append('date_packaged', document.getElementById('editPkgDate').value);
+  data.append('zip', document.getElementById('editPkgZip').value);
 
-  const formData = new FormData();
-  formData.append('package_id', id);
-
-  fetch('php/delete_package.php', {
+  fetch('php/update_package.php', {
     method: 'POST',
-    body: formData
+    body: data
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      alert('Package deleted successfully');
-      console.log(`Deleted Package_ID: ${id}`);
-      loadPackagingData(); // Refresh table
-    } else {
-      alert('Error: ' + data.message);
-      console.error('Server error:', data.message);
-    }
-  })
-  .catch(error => {
-    console.error('Delete request failed:', error);
-    alert('An error occurred while deleting the package.');
-  });
-}
-
-function updatePackagingChart(data) {
-  const typeCounts = { 'Vacuum Sealed': 0, 'Frozen': 0, 'Chilled': 0 };
-  const monthCounts = {
-    Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0,
-    Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0
-  };
-
-  data.forEach(item => {
-    const type = item.package_type;
-    const month = new Date(item.date_packaged).toLocaleString('default', { month: 'short' });
-
-    if (typeCounts[type] !== undefined) typeCounts[type]++;
-    if (monthCounts[month] !== undefined) monthCounts[month]++;
-  });
-
-  new Chart(document.getElementById('packagingTypeChart'), {
-    type: 'doughnut',
-    data: {
-      labels: Object.keys(typeCounts),
-      datasets: [{ data: Object.values(typeCounts), backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'] }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-  });
-
-  new Chart(document.getElementById('packagingVolumeChart'), {
-    type: 'bar',
-    data: {
-      labels: Object.keys(monthCounts),
-      datasets: [{
-        label: 'Packages',
-        data: Object.values(monthCounts),
-        backgroundColor: '#4CAF50'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: { y: { beginAtZero: true } }
-    }
-  });
-}
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-  loadPackagingData();
-
-  document.getElementById('editPackageForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const id = document.getElementById('editPkgId').value;
-    const data = new FormData();
-    data.append('package_id', id);
-    data.append('product_name', document.getElementById('editProductType').value); // ✅ correct field
-    data.append('package_type', document.getElementById('editPkgType').value);
-    data.append('weight', document.getElementById('editPkgWeight').value);
-    data.append('date_packaged', document.getElementById('editPkgDate').value);
-    data.append('zip', document.getElementById('editPkgZip').value);
-    data.append('quality', document.getElementById('editPkgQuality').value); // ✅ make sure this is included
-
-    fetch('php/update_package.php', {
-      method: 'POST',
-      body: data
-    })
     .then(res => res.json())
     .then(res => {
       if (res.success) {
@@ -1316,95 +1490,144 @@ document.addEventListener("DOMContentLoaded", function () {
         alert('Error: ' + res.message);
       }
     });
-  });
 });
-
-function debounce(func, timeout = 300) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => { func.apply(this, args); }, timeout);
-  };
-}
-
-// Then modify the event listener:
-document.getElementById('packagingSearch').addEventListener('input', debounce(filterPackagingTable));
-
-
-function editPackage(id) {
-  const row = [...document.querySelectorAll('#packagingTable tbody tr')].find(r => r.cells[0].textContent == id);
-  if (!row) return alert('Package not found.');
-
-  document.getElementById('editPkgId').value = id;
-  document.getElementById('editProductType').value = row.cells[2].textContent; // ✅ Product Name
-  document.getElementById('editPkgType').value = row.cells[3].textContent;
-  document.getElementById('editPkgWeight').value = row.cells[4].textContent;
-  document.getElementById('editPkgDate').value = row.cells[5].textContent;
-  document.getElementById('editPkgZip').value = row.cells[6].textContent;
-  document.getElementById('editPkgQuality').value = row.cells[7].textContent;
-
-  new bootstrap.Modal(document.getElementById('editPackageModal')).show();
-}
-
-document.getElementById('editPackageForm').addEventListener('submit', function (e) {
-  e.preventDefault();
-  const id = document.getElementById('editPkgId').value;
-  const data = new FormData();
-
-  data.append('package_id', id);
-  data.append('product_name', document.getElementById('editProductType').value); // ✅ Fixed
-  data.append('package_type', document.getElementById('editPkgType').value);
-  data.append('weight', document.getElementById('editPkgWeight').value);
-  data.append('date_packaged', document.getElementById('editPkgDate').value);
-  data.append('zip', document.getElementById('editPkgZip').value);
-  data.append('quality', document.getElementById('editPkgQuality').value);
-
-  fetch('php/update_package.php', {
-    method: 'POST',
-    body: data
-  })
-  .then(res => res.json())
-  .then(res => {
-    if (res.success) {
-      alert('Package updated successfully');
-      loadPackagingData();
-      bootstrap.Modal.getInstance(document.getElementById('editPackageModal')).hide();
-    } else {
-      alert('Error: ' + res.message);
+    
+    function deletePackage(id) {
+      if (confirm('Are you sure you want to delete this package?')) {
+        fetch('php/delete_package.php?id=' + id)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              loadPackagingData();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          });
+      }
     }
+    
+    function addTransport() {
+      const vehicleType = document.getElementById('tVehicleType').value;
+      const licensePlate = document.getElementById('tLicensePlate').value;
+      const transportDate = document.getElementById('tTransportDate').value;
+      const duration = document.getElementById('tDuration').value;
+      
+      if (!vehicleType || !licensePlate || !transportDate || !duration) {
+        alert('Please fill all fields');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('vehicle_type', vehicleType);
+      formData.append('license_plate', licensePlate);
+      formData.append('transport_date', transportDate);
+      formData.append('transportation_duration', duration);
+      
+      fetch('php/add_transport.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Transport added successfully');
+          loadTransportData();
+          // Clear form
+          document.getElementById('tLicensePlate').value = '';
+          document.getElementById('tDuration').value = '';
+        } else {
+          alert('Error: ' + data.message);
+        }
+      });
+    }
+    
+    function editTransport(id) {
+  const row = [...document.querySelectorAll('#transportTable tbody tr')].find(r => r.cells[0].textContent == id);
+  if (!row) return alert('Transport not found.');
+
+  document.getElementById('editTransportId').value = id;
+  document.getElementById('editVehicleType').value = row.cells[1].textContent;
+  document.getElementById('editLicensePlate').value = row.cells[2].textContent;
+  document.getElementById('editTransportDate').value = row.cells[3].textContent;
+  document.getElementById('editDuration').value = row.cells[4].textContent;
+
+  new bootstrap.Modal(document.getElementById('editTransportModal')).show();
+}
+
+document.getElementById('editTransportForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const id = document.getElementById('editTransportId').value;
+
+  const formData = new FormData();
+  formData.append('transport_id', id);
+  formData.append('vehicle_type', document.getElementById('editVehicleType').value);
+  formData.append('license_plate', document.getElementById('editLicensePlate').value);
+  formData.append('transport_date', document.getElementById('editTransportDate').value);
+  formData.append('transportation_duration', document.getElementById('editDuration').value);
+
+  fetch('php/update_transport.php', {
+    method: 'POST',
+    body: formData
+  }).then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        alert('Transport updated successfully');
+        bootstrap.Modal.getInstance(document.getElementById('editTransportModal')).hide();
+        loadTransportData();
+      } else {
+        alert('Error: ' + res.message);
+      }
+    });
+});
+    
+    function deleteTransport(id) {
+      if (confirm('Are you sure you want to delete this transport record?')) {
+        fetch('php/delete_transport.php?id=' + id)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              loadTransportData();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          });
+      }
+    }
+
+    
+    
+    // Other functions
+    function viewReportDetails(id) {
+      alert('Viewing details for report ' + id);
+      // In a real app, this would show a modal with detailed information
+    }
+    
+    function viewTrackingDetails(id) {
+      alert('Viewing tracking details for batch ' + id);
+      // In a real app, this would show a detailed timeline or map view
+    }
+
+    
+    document.getElementById('transportSearch').addEventListener('input', function () {
+    updateTransportUI();
+});
+
+    document.getElementById('packagingSearch').addEventListener('input', function () {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#packagingTable tbody tr');
+
+    rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(searchValue) ? '' : 'none';
   });
 });
 
-// Add this to your DOMContentLoaded event listener
-document.addEventListener("DOMContentLoaded", function () {
-  loadPackagingData();
-  
-  // Add event listeners for dynamic filtering
-  document.getElementById('packagingSearch').addEventListener('input', filterPackagingTable);
-  document.getElementById('packagingTypeFilter').addEventListener('change', filterPackagingTable);
-  document.getElementById('packagingWeightFrom').addEventListener('input', filterPackagingTable);
-  document.getElementById('packagingWeightTo').addEventListener('input', filterPackagingTable);
-  
-  // Rest of your existing code...
-});
-
-
-//Transpoart_Monitoring
- 
-
-
-  
-
-  document.getElementById('transportSearch').addEventListener('input', function () {
+document.getElementById('transportSearch').addEventListener('input', function () {
   updateTransportUI();
 });
 
 document.getElementById('transportVehicleFilter').addEventListener('change', updateTransportUI);
 document.getElementById('transportDateFilter').addEventListener('change', updateTransportUI);
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </script>
 </body>
 </html>
-
-
-
