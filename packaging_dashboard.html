@@ -283,6 +283,33 @@ function addPackaging() {
       }
     });
 }
+
+function deletePackage(id) {
+  if (!confirm('Are you sure you want to delete this package?')) return;
+
+  const formData = new FormData();
+  formData.append('package_id', id);
+
+  fetch('php/delete_package.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Package deleted successfully');
+      loadPackagingData();
+    } else {
+      alert('Error: ' + data.message);
+      console.error('Server error:', data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Request failed:', error);
+    alert('An error occurred while deleting the package.');
+  });
+}
+
 function updatePackagingChart(data) {
   const typeCounts = { 'Vacuum Sealed': 0, 'Frozen': 0, 'Chilled': 0 };
   const monthCounts = {
