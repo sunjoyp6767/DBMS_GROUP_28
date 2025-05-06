@@ -57,16 +57,21 @@ document.addEventListener('DOMContentLoaded', function() {
     editButtons.forEach(button => {
         button.addEventListener('click', function() {
             const gradeId = this.getAttribute('data-grade-id');
-            const row = this.closest('tr');
-            const cells = row.getElementsByTagName('td');
+            const description = this.getAttribute('data-description');
+            const qualityScore = this.getAttribute('data-quality-score');
+            const averageWeight = this.getAttribute('data-average-weight');
+            const textureQuality = this.getAttribute('data-texture-quality');
+            const dateOfGrading = this.getAttribute('data-date-of-grading');
+            const productTypeId = this.getAttribute('data-product-type-id');
 
             // Populate the edit form
             document.getElementById('edit_grade_id').value = gradeId;
-            document.getElementById('edit_description').value = cells[2].textContent;
-            document.getElementById('edit_quality_score').value = parseFloat(cells[3].textContent);
-            document.getElementById('edit_average_weight').value = parseFloat(cells[4].textContent);
-            document.getElementById('edit_texture_quality').value = cells[5].textContent.trim();
-            document.getElementById('edit_date_of_grading').value = cells[6].textContent;
+            document.getElementById('edit_description').value = description;
+            document.getElementById('edit_quality_score').value = qualityScore;
+            document.getElementById('edit_average_weight').value = averageWeight;
+            document.getElementById('edit_texture_quality').value = textureQuality;
+            document.getElementById('edit_date_of_grading').value = dateOfGrading;
+            document.getElementById('edit_product_type_id').value = productTypeId;
 
             // Show the edit modal
             const editModal = new bootstrap.Modal(document.getElementById('editGradeModal'));
@@ -79,6 +84,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addForm) {
         addForm.addEventListener('submit', function(event) {
             event.preventDefault();
+            
+            // Validate product type selection
+            const productTypeId = document.getElementById('add_product_type_id').value;
+            if (!productTypeId) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Please select a product type',
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
+                return;
+            }
             
             // Show confirmation dialog
             Swal.fire({
@@ -111,29 +128,28 @@ document.addEventListener('DOMContentLoaded', function() {
                         method: 'POST',
                         body: formData
                     })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.text();
-                    })
+                    .then(response => response.json())
                     .then(data => {
-                        // Show success message
-                        Swal.fire({
-                            title: 'Saved!',
-                            text: 'The grade standard has been added successfully.',
-                            icon: 'success',
-                            confirmButtonColor: '#20c997'
-                        }).then(() => {
-                            // Refresh page or update the table
-                            window.location.reload();
-                        });
+                        if (data.success) {
+                            // Show success message
+                            Swal.fire({
+                                title: 'Saved!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonColor: '#20c997'
+                            }).then(() => {
+                                // Refresh page or update the table
+                                window.location.reload();
+                            });
+                        } else {
+                            throw new Error(data.message);
+                        }
                     })
                     .catch(error => {
                         // Show error message
                         Swal.fire({
                             title: 'Error!',
-                            text: 'There was an error saving the grade: ' + error.message,
+                            text: error.message,
                             icon: 'error',
                             confirmButtonColor: '#dc3545'
                         });
@@ -148,6 +164,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (editForm) {
         editForm.addEventListener('submit', function(event) {
             event.preventDefault();
+            
+            // Validate product type selection
+            const productTypeId = document.getElementById('edit_product_type_id').value;
+            if (!productTypeId) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Please select a product type',
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
+                return;
+            }
             
             // Show confirmation dialog
             Swal.fire({
@@ -180,29 +208,28 @@ document.addEventListener('DOMContentLoaded', function() {
                         method: 'POST',
                         body: formData
                     })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.text();
-                    })
+                    .then(response => response.json())
                     .then(data => {
-                        // Show success message
-                        Swal.fire({
-                            title: 'Updated!',
-                            text: 'The grade standard has been updated successfully.',
-                            icon: 'success',
-                            confirmButtonColor: '#0dcaf0'
-                        }).then(() => {
-                            // Refresh page or update the table
-                            window.location.reload();
-                        });
+                        if (data.success) {
+                            // Show success message
+                            Swal.fire({
+                                title: 'Updated!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonColor: '#0dcaf0'
+                            }).then(() => {
+                                // Refresh page or update the table
+                                window.location.reload();
+                            });
+                        } else {
+                            throw new Error(data.message);
+                        }
                     })
                     .catch(error => {
                         // Show error message
                         Swal.fire({
                             title: 'Error!',
-                            text: 'There was an error updating the grade: ' + error.message,
+                            text: error.message,
                             icon: 'error',
                             confirmButtonColor: '#dc3545'
                         });
@@ -217,7 +244,6 @@ document.addEventListener('DOMContentLoaded', function() {
     deleteButtons.forEach(button => {
         button.addEventListener('click', function() {
             const gradeId = this.getAttribute('data-grade-id');
-            const row = this.closest('tr');
             
             // Show confirmation dialog
             Swal.fire({
@@ -245,12 +271,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     // Send delete request
+                    const formData = new FormData();
+                    formData.append('grade_id', gradeId);
+                    
                     fetch('includes/delete_grade.php', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'grade_id=' + gradeId
+                        body: formData
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -258,22 +284,22 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Show success message
                             Swal.fire({
                                 title: 'Deleted!',
-                                text: 'The grade standard has been deleted successfully.',
+                                text: data.message,
                                 icon: 'success',
-                                confirmButtonColor: '#28a745'
+                                confirmButtonColor: '#dc3545'
                             }).then(() => {
-                                // Remove row from table
-                                row.remove();
+                                // Refresh page or update the table
+                                window.location.reload();
                             });
                         } else {
-                            throw new Error(data.error);
+                            throw new Error(data.message);
                         }
                     })
                     .catch(error => {
                         // Show error message
                         Swal.fire({
                             title: 'Error!',
-                            text: 'There was an error deleting the grade: ' + (error.message || 'Unknown error'),
+                            text: error.message,
                             icon: 'error',
                             confirmButtonColor: '#dc3545'
                         });
