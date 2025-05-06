@@ -51,9 +51,6 @@
       height: 300px;
       width: 100%;
     }
-    .leaflet-routing-container {
-    display: none !important;
-  }
   </style>
 </head>
 <body onload="initializeUser(); loadAllSections();">
@@ -75,9 +72,9 @@
 
   <div class="d-flex">
     <div class="collapse d-lg-block sidebar" id="sidebarMenu">
-      <a href="Standarad _Grading/grading_standard.php">Grading Standards</a>
+      <a href="#" onclick="showSection('grading')">Grading Standards</a>
       <a href="#" onclick="showSection('reports')">Reports</a>
-      <a href="trackmeat.html">Meat Tracking</a>
+      <a href="#" onclick="showSection('tracking')">Meat Tracking</a>
       <a href="#" onclick="showSection('quality')">Quality Analysis</a>
       <a href="#" onclick="showSection('packaging')">Packaging Oversight</a>
       <a href="#" onclick="showSection('transport')">Transport Monitoring</a>
@@ -100,6 +97,7 @@
                 <th>Avg Weight</th>
                 <th>Texture</th>
                 <th>Grading Date</th>
+                <th>Cattle ID</th>
                 <th>Batch Quantity</th>
                 <th>Actions</th>
               </tr>
@@ -137,6 +135,14 @@
               </div>
               <div class="col-md-3">
                 <input type="date" class="form-control" id="gradeDate">
+              </div>
+              <div class="col-md-3">
+                <select class="form-select" id="gradeCattleId">
+                  <option value="">Select Cattle ID</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <input type="number" class="form-control" id="gradeQuantity" placeholder="Batch Quantity">
               </div>
               <div class="col-md-3">
                 <button class="btn btn-primary w-100" onclick="addGradingStandard()">Add Standard</button>
@@ -252,78 +258,78 @@
       </div>
 
       <!-- Quality Analysis Section -->
-      <div id="quality" class="section">
-        <h3>Quality Analysis & Problem Identification</h3>
-        <div class="row mb-3">
-          <div class="col-md-12">
-            <input type="text" class="form-control" id="qualitySearch" placeholder="Search by health issue, treatment, or inspection result...">
-          </div>
+<div id="quality" class="section">
+  <h3>Quality Analysis & Problem Identification</h3>
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <input type="text" class="form-control" id="qualitySearch" placeholder="Search by health issue, treatment, or inspection result...">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h5>Quality Trends Over Time</h5>
         </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="card mb-3">
-              <div class="card-header">
-                <h5>Quality Trends Over Time</h5>
-              </div>
-              <div class="card-body">
-                <div class="chart-container">
-                  <canvas id="qualityTrendChart"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <h5>Health Issues vs Quality</h5>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table class="table table-striped" id="healthQualityTable">
-                    <thead>
-                      <tr>
-                        <th>Health Issue</th>
-                        <th>Treatment</th>
-                        <th>Avg Quality</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="card mb-3">
-              <div class="card-header">
-                <h5>Facility Performance</h5>
-              </div>
-              <div class="card-body">
-                <div class="chart-container">
-                  <canvas id="facilityChart"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <h5>Problem Facilities</h5>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table class="table table-striped" id="problemFacilitiesTable">
-                    <thead>
-                      <tr>
-                        <th>Slaughterhouse</th>
-                        <th>Inspection Result</th>
-                        <th>Processing Time</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="qualityTrendChart"></canvas>
           </div>
         </div>
       </div>
+      <div class="card">
+        <div class="card-header">
+          <h5>Health Issues vs Quality</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped" id="healthQualityTable">
+              <thead>
+                <tr>
+                  <th>Health Issue</th>
+                  <th>Treatment</th>
+                  <th>Avg Quality</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h5>Facility Performance</h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="facilityChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h5>Problem Facilities</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped" id="problemFacilitiesTable">
+              <thead>
+                <tr>
+                  <th>Slaughterhouse</th>
+                  <th>Inspection Result</th>
+                  <th>Processing Time</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
       <!-- Packaging Oversight Section -->
       <div id="packaging" class="section">
@@ -453,35 +459,6 @@
             <button class="btn btn-primary w-100" onclick="updateTransportUI()">Filter</button>
           </div>
         </div>
-        <div class="card mt-3">
-          <div class="card-header">
-            <h5>Add New Transport</h5>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-3">
-                <select class="form-select" id="tVehicleType">
-                  <option value="">Vehicle Type</option>
-                  <option value="Truck">Truck</option>
-                  <option value="Van">Van</option>
-                  <option value="Refrigerated Truck">Refrigerated Truck</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <input type="text" class="form-control" id="tLicensePlate" placeholder="License Plate">
-              </div>
-              <div class="col-md-3">
-                <input type="date" class="form-control" id="tTransportDate">
-              </div>
-              <div class="col-md-2">
-                <input type="text" class="form-control" id="tDuration" placeholder="HH:MM:SS">
-              </div>
-              <div class="col-md-1">
-                <button class="btn btn-primary w-100" onclick="addTransport()">Add</button>
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="row">
           <div class="col-md-8">
             <div class="table-responsive">
@@ -501,7 +478,35 @@
                 <tbody></tbody>
               </table>
             </div>
-            
+            <div class="card mt-3">
+              <div class="card-header">
+                <h5>Add New Transport</h5>
+              </div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-3">
+                    <select class="form-select" id="tVehicleType">
+                      <option value="">Vehicle Type</option>
+                      <option value="Truck">Truck</option>
+                      <option value="Van">Van</option>
+                      <option value="Refrigerated Truck">Refrigerated Truck</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <input type="text" class="form-control" id="tLicensePlate" placeholder="License Plate">
+                  </div>
+                  <div class="col-md-3">
+                    <input type="date" class="form-control" id="tTransportDate">
+                  </div>
+                  <div class="col-md-2">
+                    <input type="text" class="form-control" id="tDuration" placeholder="HH:MM:SS">
+                  </div>
+                  <div class="col-md-1">
+                    <button class="btn btn-primary w-100" onclick="addTransport()">Add</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="col-md-4">
             <div class="card">
@@ -530,7 +535,59 @@
 
   <!-- Edit Modals -->
   <div class="modal fade" id="editGradingModal" tabindex="-1" aria-hidden="true">
-    <!-- Modal content for editing grading standards -->
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editGradingForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Grading Standard</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editGradeId">
+            <div class="mb-3">
+              <label>Product Type</label>
+              <select class="form-select" id="editProductType" disabled>
+                <option value="Mock tender">Mock tender</option>
+                <option value="Chip Steak">Chip Steak</option>
+                <option value="T-bone steak">T-bone steak</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label>Description</label>
+              <input type="text" class="form-control" id="editDescription" required>
+            </div>
+            <div class="mb-3">
+              <label>Quality Score</label>
+              <select class="form-select" id="editQualityScore" required>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label>Average Weight</label>
+              <input type="number" class="form-control" id="editAvgWeight" step="0.01" required>
+            </div>
+            <div class="mb-3">
+              <label>Texture</label>
+              <input type="text" class="form-control" id="editTexture" required>
+            </div>
+            <div class="mb-3">
+              <label>Grading Date</label>
+              <input type="date" class="form-control" id="editGradingDate" required>
+            </div>
+            <div class="mb-3">
+              <label>Batch Quantity</label>
+              <input type="number" class="form-control" id="editQuantity" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
   
   <div class="modal fade" id="editPackageModal" tabindex="-1" aria-hidden="true">
@@ -618,14 +675,40 @@
     </div>
   </div>
 
+  <!-- Modal for Viewing Report Details -->
+<div class="modal fade" id="reportDetailsModal" tabindex="-1" aria-labelledby="reportDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportDetailsModalLabel">Report Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Product Type:</strong> <span id="detailProductType"></span></p>
+        <p><strong>Grade Description:</strong> <span id="detailGradeDescription"></span></p>
+        <p><strong>Quality Score:</strong> <span id="detailQualityScore"></span></p>
+        <p><strong>Final Weight:</strong> <span id="detailFinalWeight"></span></p>
+        <p><strong>Slaughterhouse:</strong> <span id="detailSlaughterhouse"></span></p>
+        <p><strong>Inspection:</strong> <span id="detailInspection"></span></p>
+        <p><strong>Processing Time:</strong> <span id="detailProcessingTime"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // Global variables
-    let currentSection = 'transport';
+    let currentSection = 'grading';
     let map;
     let transportMarkers = [];
     let transportData = [];
     let transportConditionsChart;
+    let reportData = [];
     
     // Initialize the page
     function initializeUser() {
@@ -679,8 +762,13 @@
   
     
     // Section-specific functions
-    function loadGradingStandards() {
-  fetch('php/get_grading_standards.php')
+    function loadGradingStandards(searchTerm = '') {
+  let url = 'php/get_grading_standards.php';
+  if (searchTerm) {
+    url += `?search=${encodeURIComponent(searchTerm)}`;
+  }
+
+  fetch(url)
     .then(response => response.json())
     .then(data => {
       const tableBody = document.querySelector('#gradingTable tbody');
@@ -695,6 +783,7 @@
           <td>${item.average_weight || 'N/A'}</td>
           <td>${item.texture_quality || 'N/A'}</td>
           <td>${item.date_of_grading || 'N/A'}</td>
+          <td>${item.cattle_id || 'N/A'}</td>
           <td>${item.quantity || 'N/A'}</td>
           <td>
             <button class="btn btn-sm btn-warning" onclick="editGradingStandard(${item.grade_id})">Edit</button>
@@ -702,48 +791,92 @@
           </td>
         `;
         tableBody.appendChild(row);
-          });
-          
-          // Populate product type dropdown
-          const productTypeSelect = document.getElementById('gradeProductType');
-          productTypeSelect.innerHTML = '<option value="">Select Product Type</option>';
-          const uniqueTypes = [...new Set(data.map(item => item.product_name))];
-          uniqueTypes.forEach(type => {
-            const option = document.createElement('option');
-            option.value = type;
-            option.textContent = type;
-            productTypeSelect.appendChild(option);
-          });
-        });
-    }
-    
-    function loadQualityReports() {
-      fetch('php/get_quality_reports.php')
-        .then(response => response.json())
-        .then(data => {
-          const tableBody = document.querySelector('#reportsTable tbody');
-          tableBody.innerHTML = '';
-          
-          data.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${item.product_name}</td>
-              <td>${item.description}</td>
-              <td>${item.quality_score}</td>
-              <td>${item.final_weight || 'N/A'}</td>
-              <td>${item.slaughterhouse_name || 'N/A'}</td>
-              <td>${item.health_inspection_report || 'N/A'}</td>
-              <td>${item.processing_time || 'N/A'}</td>
-              <td>
-                <button class="btn btn-sm btn-info" onclick="viewReportDetails(${item.grade_id})">Details</button>
-              </td>
-            `;
-            tableBody.appendChild(row);
-          });
-          
-          updateReportCharts(data);
-        });
-    }
+      });
+      
+      // Populate product type dropdown
+      const productTypeSelect = document.getElementById('gradeProductType');
+      productTypeSelect.innerHTML = '<option value="">Select Product Type</option>';
+      const uniqueTypes = [...new Set(data.map(item => item.product_name))];
+      uniqueTypes.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type;
+        productTypeSelect.appendChild(option);
+      });
+      
+      // Load cattle IDs
+      loadCattleIds();
+    });
+}
+
+function loadCattleIds() {
+  fetch('php/get_cattle_ids.php')
+    .then(response => response.json())
+    .then(data => {
+      const cattleSelect = document.getElementById('gradeCattleId');
+      cattleSelect.innerHTML = '<option value="">Select Cattle ID</option>';
+      data.forEach(cattle => {
+        const option = document.createElement('option');
+        option.value = cattle.Cattle_ID;
+        option.textContent = `ID: ${cattle.Cattle_ID} (${cattle.Breed})`;
+        cattleSelect.appendChild(option);
+      });
+    });
+}
+ 
+function renderReportsTable(data) {
+  const tableBody = document.querySelector('#reportsTable tbody');
+  tableBody.innerHTML = '';
+
+  data.forEach(item => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${item.product_name}</td>
+      <td>${item.description}</td>
+      <td>${item.quality_score}</td>
+      <td>${item.final_weight || 'N/A'}</td>
+      <td>${item.slaughterhouse_name || 'N/A'}</td>
+      <td>${item.health_inspection_report || 'N/A'}</td>
+      <td>${item.processing_time || 'N/A'}</td>
+      <td>
+        <button class="btn btn-sm btn-info" onclick="viewReportDetails(${item.grade_id})">Details</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+function updateReportUI() {
+  const search = document.getElementById('reportsSearch').value.toLowerCase();
+  const quality = document.getElementById('reportQualityFilter').value;
+  const inspection = document.getElementById('reportInspectionFilter').value;
+
+  const filtered = reportData.filter(item => {
+    const matchesSearch = !search || item.product_name.toLowerCase().includes(search) || item.description.toLowerCase().includes(search);
+    const matchesQuality = !quality || item.quality_score === quality;
+    const matchesInspection = !inspection || item.health_inspection_report === inspection;
+    return matchesSearch && matchesQuality && matchesInspection;
+  });
+
+  renderReportsTable(filtered);
+  updateReportCharts(filtered);
+} 
+
+function loadQualityReports() {
+  fetch('php/get_quality_reports.php')
+    .then(response => response.json())
+    .then(data => {
+      reportData = data; // Store all the reports in the global array 'reportData'
+      renderReportsTable(reportData); // Render the reports table
+      updateReportCharts(reportData); // Update charts with initial data
+    })
+    .catch(error => {
+      console.error('Error loading quality reports:', error);
+      alert('An error occurred while loading the reports.');
+    });
+}
+
+
     
     function loadMeatTracking() {
   fetch('php/get_meat_tracking.php')
@@ -781,7 +914,7 @@
     }
     
     function loadQualityAnalysis() {
-  fetch('php/get_quality_analysis.php')
+    fetch('php/get_quality_analysis.php')
     .then(response => response.json())
     .then(data => {
       // Store the data globally for searching
@@ -799,10 +932,10 @@
     }
 
     function updateHealthQualityTable(data) {
-  const tableBody = document.querySelector('#healthQualityTable tbody');
-  tableBody.innerHTML = '';
+    const tableBody = document.querySelector('#healthQualityTable tbody');
+    tableBody.innerHTML = '';
   
-  data.forEach(item => {
+    data.forEach(item => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${item.health_issue || 'N/A'}</td>
@@ -810,14 +943,14 @@
       <td>${item.avg_quality ? parseFloat(item.avg_quality).toFixed(2) : 'N/A'}</td>
     `;
     tableBody.appendChild(row);
-  });
-}
+    });
+    }
 
-function updateProblemFacilitiesTable(data) {
-  const tableBody = document.querySelector('#problemFacilitiesTable tbody');
-  tableBody.innerHTML = '';
+    function updateProblemFacilitiesTable(data) {
+    const tableBody = document.querySelector('#problemFacilitiesTable tbody');
+    tableBody.innerHTML = '';
   
-  data.forEach(item => {
+    data.forEach(item => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${item.name}</td>
@@ -825,8 +958,8 @@ function updateProblemFacilitiesTable(data) {
       <td>${item.processing_time}</td>
     `;
     tableBody.appendChild(row);
-  });
-}
+    });
+    }
     
     function loadPackagingData() {
       fetch('php/get_packaging_data.php')
@@ -1093,9 +1226,8 @@ function loadTransportData() {
       });
     });
 
-      
-      // Facility performance chart
-      const facilityCtx = document.getElementById('facilityChart').getContext('2d');
+  // Facility performance chart - using actual data
+  const facilityCtx = document.getElementById('facilityChart').getContext('2d');
   
   fetch('php/get_facility_performance.php')
     .then(response => response.json())
@@ -1369,64 +1501,149 @@ function updateTransportUI() {
     
     // CRUD operations
     function addGradingStandard() {
-      const productType = document.getElementById('gradeProductType').value;
-      const description = document.getElementById('gradeDescription').value;
-      const qualityScore = document.getElementById('gradeQualityScore').value;
-      const avgWeight = document.getElementById('gradeAvgWeight').value;
-      const texture = document.getElementById('gradeTexture').value;
-      const date = document.getElementById('gradeDate').value;
-      
-      if (!productType || !description || !qualityScore || !avgWeight || !texture || !date) {
-        alert('Please fill all fields');
+  const productType = document.getElementById('gradeProductType').value;
+  const description = document.getElementById('gradeDescription').value;
+  const qualityScore = document.getElementById('gradeQualityScore').value;
+  const avgWeight = document.getElementById('gradeAvgWeight').value;
+  const texture = document.getElementById('gradeTexture').value;
+  const date = document.getElementById('gradeDate').value;
+  const cattleId = document.getElementById('gradeCattleId').value;
+  const quantity = document.getElementById('gradeQuantity').value;
+  
+  if (!productType || !description || !qualityScore || !avgWeight || !texture || !date || !cattleId || !quantity) {
+    alert('Please fill all fields');
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('Product_Type', productType);
+  formData.append('Description', description);
+  formData.append('Quality_Score', qualityScore);
+  formData.append('Average_Weight', avgWeight);
+  formData.append('Texture_Quality', texture);
+  formData.append('Date_of_Grading', date);
+  formData.append('Cattle_ID', cattleId);
+  formData.append('Quantity', quantity);
+  formData.append('Inspector_Name', localStorage.getItem("username") || "Unknown");
+  formData.append('Inspection_Notes', "Added via dashboard");
+  
+  fetch('php/add_grading_standard.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Grading standard added successfully');
+      loadGradingStandards();
+      // Clear form
+      document.getElementById('gradeProductType').value = '';
+      document.getElementById('gradeDescription').value = '';
+      document.getElementById('gradeQualityScore').value = '';
+      document.getElementById('gradeAvgWeight').value = '';
+      document.getElementById('gradeTexture').value = '';
+      document.getElementById('gradeDate').value = '';
+      document.getElementById('gradeCattleId').value = '';
+      document.getElementById('gradeQuantity').value = '';
+    } else {
+      alert('Error: ' + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred while adding the grading standard');
+  });
+}
+    
+function editGradingStandard(id) {
+  // Fetch the grading standard data
+  fetch('php/get_grading_standard.php?id=' + id)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
         return;
       }
-      
-      const formData = new FormData();
-      formData.append('product_type', productType);
-      formData.append('description', description);
-      formData.append('quality_score', qualityScore);
-      formData.append('average_weight', avgWeight);
-      formData.append('texture_quality', texture);
-      formData.append('date_of_grading', date);
-      
-      fetch('php/add_grading_standard.php', {
-        method: 'POST',
-        body: formData
-      })
+
+      // Populate the edit form
+      document.getElementById('editGradeId').value = data.Grade_ID;
+      document.getElementById('editDescription').value = data.Description;
+      document.getElementById('editQualityScore').value = data.Quality_Score;
+      document.getElementById('editAvgWeight').value = data.Average_Weight;
+      document.getElementById('editTexture').value = data.Texture_Quality;
+      document.getElementById('editGradingDate').value = data.Date_of_Grading;
+      document.getElementById('editQuantity').value = data.Quantity;
+
+      // Set the product type dropdown
+      const productTypeSelect = document.getElementById('editProductType');
+      const options = Array.from(productTypeSelect.options);
+      const optionToSelect = options.find(option => option.text === data.product_name);
+      if (optionToSelect) {
+        optionToSelect.selected = true;
+      }
+
+      // Show the modal
+      new bootstrap.Modal(document.getElementById('editGradingModal')).show();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error loading grading standard data');
+    });
+}
+
+// Update the form submission handler
+document.getElementById('editGradingForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData();
+  formData.append('grade_id', document.getElementById('editGradeId').value);
+  formData.append('description', document.getElementById('editDescription').value);
+  formData.append('quality_score', document.getElementById('editQualityScore').value);
+  formData.append('average_weight', document.getElementById('editAvgWeight').value);
+  formData.append('texture', document.getElementById('editTexture').value);
+  formData.append('grading_date', document.getElementById('editGradingDate').value);
+  formData.append('quantity', document.getElementById('editQuantity').value);
+
+  fetch('php/update_grading_standard.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Grading standard updated successfully');
+      loadGradingStandards();
+      bootstrap.Modal.getInstance(document.getElementById('editGradingModal')).hide();
+    } else {
+      alert('Error: ' + (data.message || 'Failed to update grading standard'));
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred while updating the grading standard');
+  });
+});
+
+    
+function deleteGradingStandard(id) {
+  if (confirm('Are you sure you want to delete this grading standard? This will also delete the associated batch records.')) {
+    fetch('php/delete_grading_standard.php?id=' + id)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          alert('Grading standard added successfully');
+          alert('Grading standard deleted successfully');
           loadGradingStandards();
-          // Clear form
-          document.getElementById('gradeDescription').value = '';
-          document.getElementById('gradeAvgWeight').value = '';
-          document.getElementById('gradeTexture').value = '';
         } else {
           alert('Error: ' + data.message);
         }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the grading standard');
       });
-    }
-    
-    function editGradingStandard(id) {
-      // In a real app, this would fetch the existing data and populate a modal form
-      alert('Edit functionality for grading standard ' + id + ' would be implemented here');
-    }
-    
-    function deleteGradingStandard(id) {
-      if (confirm('Are you sure you want to delete this grading standard?')) {
-        fetch('php/delete_grading_standard.php?id=' + id)
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              loadGradingStandards();
-            } else {
-              alert('Error: ' + data.message);
-            }
-          });
-      }
-    }
-    
+  }
+}
+
     function addPackaging() {
       const batchId = document.getElementById('pkgBatchId').value;
       const pkgType = document.getElementById('pkgType').value;
@@ -1609,9 +1826,31 @@ document.getElementById('editTransportForm').addEventListener('submit', function
     
     // Other functions
     function viewReportDetails(id) {
-      alert('Viewing details for report ' + id);
-      // In a real app, this would show a modal with detailed information
-    }
+  // Find the report in the global reportData array based on grade_id
+  const report = reportData.find(item => item.grade_id == id);
+
+  if (report) {
+    // Populate the modal with the report details
+    document.getElementById('detailProductType').textContent = report.product_name || 'N/A';
+    document.getElementById('detailGradeDescription').textContent = report.description || 'N/A';
+    document.getElementById('detailQualityScore').textContent = report.quality_score || 'N/A';
+    document.getElementById('detailFinalWeight').textContent = report.final_weight ? report.final_weight + ' kg' : 'N/A';
+    document.getElementById('detailSlaughterhouse').textContent = report.slaughterhouse_name || 'N/A';
+    document.getElementById('detailInspection').textContent = report.health_inspection_report || 'N/A';
+    document.getElementById('detailProcessingTime').textContent = report.processing_time || 'N/A';
+    document.getElementById('detailInspectorName').textContent = report.inspector_name || 'N/A';
+    document.getElementById('detailInspectionNotes').textContent = report.inspection_notes || 'No notes available';
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('reportDetailsModal'));
+    modal.show();
+  } else {
+    // If the report is not found, display an error message
+    alert('Report details not found.');
+  }
+}
+
+
     
     function viewTrackingDetails(id) {
       alert('Viewing tracking details for batch ' + id);
@@ -1637,30 +1876,17 @@ document.getElementById('transportSearch').addEventListener('input', function ()
   updateTransportUI();
 });
 
+document.getElementById('gradingSearch').addEventListener('input', function() {
+  const searchTerm = this.value.trim();
+  loadGradingStandards(searchTerm);
+});
+
 document.getElementById('transportVehicleFilter').addEventListener('change', updateTransportUI);
 document.getElementById('transportDateFilter').addEventListener('change', updateTransportUI);
 
-document.getElementById('qualitySearch').addEventListener('input', function() {
-  const searchTerm = this.value.toLowerCase();
-  
-  if (!window.qualityAnalysisData) return;
-  
-  // Filter health issues
-  const filteredHealth = window.qualityAnalysisData.healthIssues.filter(item => {
-    return (item.health_issue && item.health_issue.toLowerCase().includes(searchTerm)) ||
-           (item.treatment_type && item.treatment_type.toLowerCase().includes(searchTerm));
-  });
-  
-  // Filter facilities
-  const filteredFacilities = window.qualityAnalysisData.problemFacilities.filter(item => {
-    return (item.name && item.name.toLowerCase().includes(searchTerm)) ||
-           (item.health_inspection_report && item.health_inspection_report.toLowerCase().includes(searchTerm));
-  });
-  
-  // Update tables with filtered data
-  updateHealthQualityTable(filteredHealth);
-  updateProblemFacilitiesTable(filteredFacilities);
-});
+document.getElementById('reportsSearch').addEventListener('input', updateReportUI);
+document.getElementById('reportQualityFilter').addEventListener('change', updateReportUI);
+document.getElementById('reportInspectionFilter').addEventListener('change', updateReportUI);
   </script>
 </body>
 </html>
