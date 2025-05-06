@@ -250,29 +250,139 @@
 
         <div id="transport" class="section d-none">
           <h3>Transport Monitoring</h3>
-          <input type="text" id="transportSearch" class="form-control mb-2" placeholder="Search Transport..." onkeyup="updateTransportUI()">
-          <table class="table" id="transportTable">
-            <thead>
-              <tr>
-                <th>Transport_ID</th><th>Delivery_ID</th><th>Sensor_ID</th><th>Store_ID</th><th>Vehicle_Type</th><th>License_Plate</th><th>Transportation_Date</th><th>Transport_Duration</th><th>Action</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div class="mb-3 row g-2">
-            <input class="form-control col" id="t1" placeholder="Delivery_ID">
-            <input class="form-control col" id="t2" placeholder="Sensor_ID">
-            <input class="form-control col" id="t3" placeholder="Store_ID">
-            <input class="form-control col" id="t4" placeholder="Vehicle_Type">
-            <input class="form-control col" id="t5" placeholder="License_Plate">
-            <input class="form-control col" id="t6" placeholder="Transportation_Date">
-            <input class="form-control col" id="t7" placeholder="Transport_Duration">
-            <button class="btn btn-primary col" onclick="addTransport()">Add</button>
-          </div>
-          <div id="map"></div>
-        </div>
-      </div>
-    </div>
+          <div class="container">
+            <!-- Filter/Search -->
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <input type="text" class="form-control" id="transportSearch" placeholder="Search License Plate...">
+                </div>
+                <div class="col-md-3">
+                  <select class="form-select" id="transportVehicleFilter">
+                    <option value="">All Vehicles</option>
+                    <option value="Truck">Truck</option>
+                    <option value="Van">Van</option>
+                    <option value="Refrigerated Truck">Refrigerated Truck</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <input type="date" class="form-control" id="transportDateFilter">
+                </div>
+                <div class="col-md-2">
+                  <button class="btn btn-primary w-100" onclick="updateTransportUI()">Filter</button>
+                </div>
+              </div>
+
+              <!-- Add Transport -->
+              <div class="card mb-4">
+                <div class="card-header">Add New Transport</div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-3">
+                      <select class="form-select" id="newVehicleType">
+                        <option value="">Vehicle Type</option>
+                        <option value="Truck">Truck</option>
+                        <option value="Van">Van</option>
+                        <option value="Refrigerated Truck">Refrigerated Truck</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <input type="text" class="form-control" id="newLicensePlate" placeholder="License Plate">
+                    </div>
+                    <div class="col-md-3">
+                      <input type="date" class="form-control" id="newTransportDate">
+                    </div>
+                    <div class="col-md-2">
+                      <input type="text" class="form-control" id="newDuration" placeholder="HH:MM:SS">
+                    </div>
+                    <div class="col-md-1">
+                      <button class="btn btn-success w-100" onclick="addTransport()">Add</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Edit Modal -->
+            <div class="modal fade" id="editTransportModal" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form id="editTransportForm">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Edit Transport</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <input type="hidden" id="editTransportId">
+                      <div class="mb-3">
+                        <label>Vehicle Type</label>
+                        <select class="form-select" id="editVehicleType">
+                          <option value="Truck">Truck</option>
+                          <option value="Van">Van</option>
+                          <option value="Refrigerated Truck">Refrigerated Truck</option>
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label>License Plate</label>
+                        <input type="text" class="form-control" id="editLicensePlate">
+                      </div>
+                      <div class="mb-3">
+                        <label>Transport Date</label>
+                        <input type="date" class="form-control" id="editTransportDate">
+                      </div>
+                      <div class="mb-3">
+                        <label>Duration</label>
+                        <input type="text" class="form-control" id="editDuration">
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button class="btn btn-success" type="submit">Save</button>
+                      <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          
+              <!-- Table -->
+              <div class="table-responsive mb-4">
+                <table class="table table-bordered" id="transportTable">
+                  <thead>
+                    <tr>
+                      <th>Transport ID</th>
+                      <th>Vehicle Type</th>
+                      <th>License Plate</th>
+                      <th>Transport Date</th>
+                      <th>Duration</th>
+                      <th>Temperature</th>
+                      <th>Humidity</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+          
+              
+          
+              <!-- Charts + Map -->
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card mb-4">
+                    <div class="card-header">Transport Conditions</div>
+                    <div class="card-body">
+                      <canvas id="transportConditionsChart" class="chart-container"></canvas>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card mb-4">
+                    <div class="card-header">Transport Route Map</div>
+                    <div class="card-body"><div id="map"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            
   </div>
 
 
