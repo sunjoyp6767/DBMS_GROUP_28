@@ -527,6 +527,171 @@
     </div>
   </div>
 
+  <!-- Edit Modals -->
+  <div class="modal fade" id="editGradingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editGradingForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Grading Standard</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editGradeId">
+            <div class="mb-3">
+              <label>Product Type</label>
+              <select class="form-select" id="editProductType" disabled>
+                <option value="Mock tender">Mock tender</option>
+                <option value="Chip Steak">Chip Steak</option>
+                <option value="T-bone steak">T-bone steak</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label>Description</label>
+              <input type="text" class="form-control" id="editDescription" required>
+            </div>
+            <div class="mb-3">
+              <label>Quality Score</label>
+              <select class="form-select" id="editQualityScore" required>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label>Average Weight</label>
+              <input type="number" class="form-control" id="editAvgWeight" step="0.01" required>
+            </div>
+            <div class="mb-3">
+              <label>Texture</label>
+              <input type="text" class="form-control" id="editTexture" required>
+            </div>
+            <div class="mb-3">
+              <label>Grading Date</label>
+              <input type="date" class="form-control" id="editGradingDate" required>
+            </div>
+            <div class="mb-3">
+              <label>Batch Quantity</label>
+              <input type="number" class="form-control" id="editQuantity" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="editPackageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editPackageForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Package</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editPkgId">
+            <div class="mb-3">
+              <label>Package Type</label>
+              <select class="form-select" id="editPkgType">
+                <option value="Vacuum Sealed">Vacuum Sealed</option>
+                <option value="Frozen">Frozen</option>
+                <option value="Chilled">Chilled</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label>Weight (kg)</label>
+              <input type="number" class="form-control" id="editPkgWeight">
+            </div>
+            <div class="mb-3">
+              <label>Date Packaged</label>
+              <input type="date" class="form-control" id="editPkgDate">
+            </div>
+            <div class="mb-3">
+              <label>ZIP Code</label>
+              <input type="text" class="form-control" id="editPkgZip">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+  </div>
+  
+  <div class="modal fade" id="editTransportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editTransportForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Transport</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editTransportId">
+    
+            <div class="mb-3">
+              <label>Vehicle Type</label>
+              <select class="form-select" id="editVehicleType">
+                <option value="Truck">Truck</option>
+                <option value="Van">Van</option>
+                <option value="Refrigerated Truck">Refrigerated Truck</option>
+              </select>
+            </div>
+    
+            <div class="mb-3">
+              <label>License Plate</label>
+              <input type="text" class="form-control" id="editLicensePlate">
+            </div>
+    
+            <div class="mb-3">
+              <label>Transport Date</label>
+              <input type="date" class="form-control" id="editTransportDate">
+            </div>
+    
+            <div class="mb-3">
+              <label>Duration (HH:MM:SS)</label>
+              <input type="text" class="form-control" id="editDuration">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Viewing Report Details -->
+<div class="modal fade" id="reportDetailsModal" tabindex="-1" aria-labelledby="reportDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportDetailsModalLabel">Report Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Product Type:</strong> <span id="detailProductType"></span></p>
+        <p><strong>Grade Description:</strong> <span id="detailGradeDescription"></span></p>
+        <p><strong>Quality Score:</strong> <span id="detailQualityScore"></span></p>
+        <p><strong>Final Weight:</strong> <span id="detailFinalWeight"></span></p>
+        <p><strong>Slaughterhouse:</strong> <span id="detailSlaughterhouse"></span></p>
+        <p><strong>Inspection:</strong> <span id="detailInspection"></span></p>
+        <p><strong>Processing Time:</strong> <span id="detailProcessingTime"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
