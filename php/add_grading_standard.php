@@ -7,7 +7,14 @@ $stmt = $conn->prepare("SELECT Product_Type_ID FROM meat_product_type WHERE Name
 $stmt->bind_param("s", $productType);
 $stmt->execute();
 $result = $stmt->get_result();
-$productTypeId = $result->fetch_assoc()['Product_Type_ID'];
+
+if ($result->num_rows === 0) {
+    echo json_encode(['success' => false, 'message' => 'Product type not found']);
+    exit();
+}
+
+$row = $result->fetch_assoc();
+$productTypeId = $row['Product_Type_ID'];
 
 // Insert grading standard
 $stmt = $conn->prepare("INSERT INTO meat_product_grade 
@@ -26,8 +33,30 @@ $stmt->bind_param("isssssss",
 );
 
 if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'Grade_ID' => $stmt->insert_id]);
+    $gradeId = $stmt->insert_id;
+    
+    // Now create the meat batch record
+    $batchStmt = $conn->prepare("INSERT INTO meat_batch 
+                                (Date_Processed, Quantity, Grade_ID, Cattle_ID, Weight) 
+                                VALUES (?, ?, ?, ?, ?)");
+    $batchStmt->bind_param("siiid",
+        $_POST['Date_of_Grading'],
+        $_POST['Quantity'],
+        $gradeId,
+        $_POST['Cattle_ID'],
+        $_POST['Average_Weight']
+    );
+    
+    if ($batchStmt->execute()) {
+        echo json_encode(['success' => true, 'Grade_ID' => $gradeId]);
+    } else {
+        // Roll back the grading standard if batch creation fails
+        $conn->query("DELETE FROM meat_product_grade WHERE Grade_ID = $gradeId");
+        echo json_encode(['success' => false, 'message' => 'Failed to create batch: ' . $conn->error]);
+    }
 } else {
     echo json_encode(['success' => false, 'message' => $conn->error]);
 }
+
+$conn->close();
 ?>
