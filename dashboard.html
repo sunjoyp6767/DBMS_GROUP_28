@@ -474,14 +474,15 @@ function deletePackage(id) {
   .then(data => {
     if (data.success) {
       alert('Package deleted successfully');
-      loadPackagingData();
+      console.log(`Deleted Package_ID: ${id}`);
+      loadPackagingData(); // Refresh table
     } else {
       alert('Error: ' + data.message);
       console.error('Server error:', data.message);
     }
   })
   .catch(error => {
-    console.error('Request failed:', error);
+    console.error('Delete request failed:', error);
     alert('An error occurred while deleting the package.');
   });
 }
