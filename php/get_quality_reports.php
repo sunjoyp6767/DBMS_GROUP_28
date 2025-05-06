@@ -9,7 +9,9 @@ $query = "SELECT g.Grade_ID, t.Name as product_name, g.Description, g.Quality_Sc
           JOIN meat_product_type t ON g.Product_Type_ID = t.Product_Type_ID
           LEFT JOIN meat_batch b ON g.Grade_ID = b.Grade_ID
           LEFT JOIN processed_meat_batch p ON b.Batch_ID = p.Batch_ID
-          LEFT JOIN slaughtering_house s ON p.House_ID = s.House_ID";
+          LEFT JOIN slaughtering_house s ON p.House_ID = s.House_ID
+          ORDER BY g.Grade_ID DESC";
+
 $result = $conn->query($query);
 
 $data = [];
