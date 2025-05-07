@@ -213,24 +213,22 @@ INSERT INTO `meat_batch` (`Batch_ID`, `Date_Processed`, `Quantity`, `Grade_ID`, 
 
 CREATE TABLE `meat_product_grade` (
   `Grade_ID` int(11) NOT NULL,
-  `Product_Type_ID` int(11) NOT NULL,
   `Description` text NOT NULL,
-  `Quality_Score` varchar(50) NOT NULL,
-  `Average_Weight` float NOT NULL,
-  `Texture_Quality` varchar(100) NOT NULL,
+  `Quality_Score` decimal(3,2) NOT NULL,
+  `Average_Weight` decimal(5,2) NOT NULL,
+  `Texture_Quality` varchar(50) NOT NULL,
   `Date_of_Grading` date NOT NULL,
-  `Inspector_Name` varchar(100) NOT NULL,
-  `Inspection_Notes` text DEFAULT NULL
+  `Product_Type_ID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `meat_product_grade`
 --
 
-INSERT INTO `meat_product_grade` (`Grade_ID`, `Product_Type_ID`, `Description`, `Quality_Score`, `Average_Weight`, `Texture_Quality`, `Date_of_Grading`, `Inspector_Name`, `Inspection_Notes`) VALUES
-(1, 1, 'Affordable alternative', 'High', 120.5, 'Tender', '2023-06-01', 'John Smith', 'Excellent marbling and color'),
-(2, 2, 'Thinly sliced cut', 'Medium', 90, 'Firm', '2023-07-10', 'Sarah Johnson', 'Slightly dry but acceptable'),
-(3, 3, 'Lean and economical', 'High', 60, 'Juicy', '2023-08-15', 'Michael Brown', 'Perfect texture and freshness');
+INSERT INTO `meat_product_grade` (`Grade_ID`, `Description`, `Quality_Score`, `Average_Weight`, `Texture_Quality`, `Date_of_Grading`, `Product_Type_ID`) VALUES
+(1, 'Grade A beef, well marbled with excellent tenderness', 9.50, 150.00, 'Tender', '2025-05-01', 1),
+(2, 'Grade B pork, lean with a good balance of fat', 8.00, 120.00, 'Medium', '2025-05-02', 2),
+(3, 'Grade A chicken, free-range and hormone-free', 9.00, 3.50, 'Tender', '2025-05-03', 3);
 
 -- --------------------------------------------------------
 
@@ -241,20 +239,20 @@ INSERT INTO `meat_product_grade` (`Grade_ID`, `Product_Type_ID`, `Description`, 
 CREATE TABLE `meat_product_type` (
   `Product_Type_ID` int(11) NOT NULL,
   `Name` varchar(100) NOT NULL,
-  `Description` text NOT NULL
+  `Description` text NOT NULL,
+  `Cattle_ID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `meat_product_type`
 --
 
-INSERT INTO `meat_product_type` (`Product_Type_ID`, `Name`, `Description`) VALUES
-(1, 'Mock tender', 'Affordable alternative'),
-(2, 'Chip Steak', 'Thinly sliced cut'),
-(3, 'T-bone steak', 'Lean and economical');
+INSERT INTO `meat_product_type` (`Product_Type_ID`, `Name`, `Description`, `Cattle_ID`) VALUES
+(1, 'Beef', 'High quality beef from mature cattle', 1),
+(2, 'Pork', 'Tender pork from young pigs', 2),
+(3, 'Chicken', 'Fresh chicken from healthy poultry', 3);
 
 -- --------------------------------------------------------
-
 --
 -- Table structure for table `package`
 --
@@ -553,9 +551,10 @@ ALTER TABLE `meat_product_grade`
 --
 ALTER TABLE `meat_product_type`
   ADD PRIMARY KEY (`Product_Type_ID`),
-  ADD UNIQUE KEY `Name` (`Name`);
+  ADD KEY `Cattle_ID` (`Cattle_ID`);
 
 --
+
 -- Indexes for table `package`
 --
 ALTER TABLE `package`
